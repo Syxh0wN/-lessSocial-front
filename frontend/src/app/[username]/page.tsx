@@ -1,11 +1,12 @@
 import { TopBar } from "@/components/topBar";
 import { auth } from "@/auth";
 import { FeedPostCard } from "@/components/feedPostCard";
+import { ProfileTestimonialsTimeline } from "@/components/profileTestimonialsTimeline";
 import {
   fetchProfile,
   fetchProfileAlbums,
   fetchProfilePosts,
-  fetchProfileTestimonials,
+  fetchProfileTestimonialsPage,
   type FeedPost,
 } from "@/lib/api";
 import {
@@ -38,10 +39,20 @@ export default async function ProfilePage({
   const profile = await fetchProfile(username).catch(() => null);
   const posts = await fetchProfilePosts(username).catch(() => []);
   const albums = await fetchProfileAlbums(username).catch(() => []);
-  const testimonials = await fetchProfileTestimonials(username).catch(() => []);
+  const testimonialsPage = await fetchProfileTestimonialsPage(
+    username,
+    undefined,
+    8,
+  ).catch(() => ({
+    items: [],
+    hasMore: false,
+    nextCursor: null,
+    totalCount: 0,
+  }));
+  const testimonials = testimonialsPage.items;
   const postCount = posts.length;
   const albumCount = albums.length;
-  const testimonialCount = testimonials.length;
+  const testimonialCount = testimonialsPage.totalCount;
   const mediaCount = posts.reduce(
     (total: number, postItem: { media?: unknown[] }) => total + (postItem.media?.length ?? 0),
     0,
@@ -172,40 +183,31 @@ export default async function ProfilePage({
               <p className="mt-2 text-xs text-muted">
                 Albuns: <b className="text-foreground">{albumCount}</b>
               </p>
-              <p className="mt-1 text-xs text-muted">
-                Depoimentos:{" "}
-                <b className="text-foreground">{testimonialCount}</b>
-              </p>
               <div className="mt-4 flex flex-wrap gap-5 text-sm text-muted">
-                <span className="inline-flex items-center gap-2">
+                <Link
+                  href={`/${username}`}
+                  className={`inline-flex items-center gap-2 transition ${
+                    activeTab === "posts"
+                      ? "text-primary"
+                      : "text-muted hover:text-primary"
+                  }`}
+                >
                   <FileImage size={14} />
                   <b className="text-foreground">{postCount}</b> Posts
-                </span>
+                </Link>
                 <span className="inline-flex items-center gap-2">
                   <ImageIcon size={14} />
                   <b className="text-foreground">{mediaCount}</b> Midias
                 </span>
-              </div>
-              <div className="mt-4 flex items-center gap-2">
-                <Link
-                  href={`/${username}`}
-                  className={`rounded-full px-3 py-1 text-xs transition ${
-                    activeTab === "posts"
-                      ? "bg-primary text-white"
-                      : "border border-borderColor bg-background text-muted hover:border-primary"
-                  }`}
-                >
-                  Posts
-                </Link>
                 <Link
                   href={`/${username}?tab=depoimentos`}
-                  className={`rounded-full px-3 py-1 text-xs transition ${
+                  className={`inline-flex items-center gap-2 transition ${
                     activeTab === "depoimentos"
-                      ? "bg-primary text-white"
-                      : "border border-borderColor bg-background text-muted hover:border-primary"
+                      ? "text-primary"
+                      : "text-muted hover:text-primary"
                   }`}
                 >
-                  Depoimentos
+                  <b className="text-foreground">{testimonialCount}</b> Depoimentos
                 </Link>
               </div>
             </div>
@@ -213,40 +215,12 @@ export default async function ProfilePage({
         </section>
 
         {activeTab === "depoimentos" ? (
-          testimonials.length === 0 ? (
-            <div className="rounded-2xl border border-borderColor bg-surface p-5 text-sm text-muted">
-              Nenhum depoimento aceito ainda.
-            </div>
-          ) : (
-            <div className="flex flex-col gap-3">
-              {testimonials.map((testimonialItem) => (
-                <article
-                  key={testimonialItem.id}
-                  className="rounded-2xl border border-borderColor bg-surface p-4"
-                >
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={
-                        testimonialItem.fromUser.profile?.avatarUrl ??
-                        "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=300&auto=format&fit=crop"
-                      }
-                      alt={`Depoimento${testimonialItem.fromUser.username}`}
-                      className="h-10 w-10 rounded-full border border-borderColor object-cover"
-                    />
-                    <div>
-                      <p className="text-sm font-semibold">
-                        @{testimonialItem.fromUser.username}
-                      </p>
-                      <p className="text-[11px] text-muted">
-                        {new Date(testimonialItem.createdAt).toLocaleDateString("pt-BR")}
-                      </p>
-                    </div>
-                  </div>
-                  <p className="mt-3 text-sm text-foreground">{testimonialItem.content}</p>
-                </article>
-              ))}
-            </div>
-          )
+          <ProfileTestimonialsTimeline
+            username={username}
+            initialItems={testimonials}
+            initialNextCursor={testimonialsPage.nextCursor}
+            initialHasMore={testimonialsPage.hasMore}
+          />
         ) : posts.length === 0 ? (
           <div className="rounded-2xl border border-borderColor bg-surface p-5 text-sm text-muted">
             Nenhum post publicado ainda.

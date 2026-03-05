@@ -75,6 +75,13 @@ export type TestimonialResponse = {
   };
 };
 
+export type TestimonialPageResponse = {
+  items: TestimonialResponse[];
+  hasMore: boolean;
+  nextCursor: string | null;
+  totalCount: number;
+};
+
 export type ProfileResponse = {
   id: string;
   userId: string;
@@ -254,16 +261,49 @@ export async function fetchProfileAlbums(username: string) {
 export async function fetchProfileTestimonials(
   username: string,
 ): Promise<TestimonialResponse[]> {
+  const firstPage = await fetchProfileTestimonialsPage(username, undefined, 8);
+  return firstPage.items;
+}
+
+export async function fetchProfileTestimonialsPage(
+  username: string,
+  cursor?: string,
+  limit = 8,
+): Promise<TestimonialPageResponse> {
   if (UseMockData) {
-    return BuildMockTestimonialsData(username);
+    const mockItems = BuildMockTestimonialsData(username);
+    const safeLimit = Math.min(Math.max(limit, 1), 20);
+    const startIndex = Number.parseInt(cursor ?? "0", 10);
+    const safeStartIndex = Number.isNaN(startIndex) ? 0 : Math.max(startIndex, 0);
+    const endIndex = safeStartIndex + safeLimit;
+    const items = mockItems.slice(safeStartIndex, endIndex);
+    const hasMore = endIndex < mockItems.length;
+    return {
+      items,
+      hasMore,
+      nextCursor: hasMore ? String(endIndex) : null,
+      totalCount: mockItems.length,
+    };
   }
   try {
-    const response = await apiClient.get<TestimonialResponse[]>(
+    const response = await apiClient.get<TestimonialPageResponse>(
       `/profiles/${username}/testimonials`,
+      {
+        params: {
+          cursor,
+          limit,
+        },
+      },
     );
     return response.data;
   } catch {
-    return BuildMockTestimonialsData(username);
+    const mockItems = BuildMockTestimonialsData(username);
+    return {
+      items: mockItems.slice(0, limit),
+      hasMore: mockItems.length > limit,
+      nextCursor: mockItems.length > limit ? String(limit) : null,
+      totalCount: mockItems.length,
+    };
   }
 }
 
