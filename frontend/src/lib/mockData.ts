@@ -40,7 +40,13 @@ export const MockFeedData: FeedPost[] = [
   {
     id: "post_1",
     caption: "Primeiro post de teste para o portfolio",
-    user: { username: BaseUsername },
+    user: {
+      username: BaseUsername,
+      name: "Leo",
+      bio: "Criador do LessSocial",
+      avatarUrl:
+        "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=300&auto=format&fit=crop",
+    },
     media: [
       {
         id: "media_1",
@@ -54,7 +60,13 @@ export const MockFeedData: FeedPost[] = [
   {
     id: "post_2",
     caption: "MockData ativo sem deploy do backend",
-    user: { username: "devuser" },
+    user: {
+      username: "devuser",
+      name: "Dev User",
+      bio: "Perfil de teste para preview no feed",
+      avatarUrl:
+        "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=300&auto=format&fit=crop",
+    },
     media: [
       {
         id: "media_2",

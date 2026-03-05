@@ -17,6 +17,14 @@ export type FeedPost = {
   caption: string | null;
   user: {
     username: string;
+    name?: string;
+    bio?: string;
+    avatarUrl?: string;
+    profile?: {
+      name?: string;
+      bio?: string;
+      avatarUrl?: string;
+    };
   };
   media: Array<{
     id: string;
@@ -27,12 +35,60 @@ export type FeedPost = {
   comments: Array<{ id: string }>;
 };
 
-export async function fetchFeed(): Promise<FeedPost[]> {
+export type PostDetail = {
+  id: string;
+  caption: string | null;
+  createdAt: string;
+  user: {
+    username: string;
+    profile?: {
+      name?: string;
+      bio?: string;
+      avatarUrl?: string;
+    };
+  };
+  media: Array<{
+    id: string;
+    type: "image" | "video";
+    url: string;
+  }>;
+  likes: Array<{
+    id: string;
+    user: {
+      username: string;
+    };
+  }>;
+  comments: Array<{
+    id: string;
+    content: string;
+    user: {
+      username: string;
+      profile?: {
+        avatarUrl?: string;
+      };
+    };
+    replies: Array<{
+      id: string;
+      content: string;
+      user: {
+        username: string;
+      };
+    }>;
+  }>;
+};
+
+export async function fetchFeed(accessToken?: string): Promise<FeedPost[]> {
   if (UseMockData) {
     return MockFeedData;
   }
   try {
-    const response = await apiClient.get<FeedPost[]>("/feed");
+    const response = await apiClient.get<FeedPost[]>("/feed", {
+      headers: accessToken
+        ? {
+            Authorization: `Bearer ${accessToken}`,
+          }
+        : undefined,
+    });
     return response.data;
   } catch {
     return MockFeedData;
@@ -72,5 +128,64 @@ export async function fetchProfileAlbums(username: string) {
     return response.data;
   } catch {
     return BuildMockProfileAlbumsData(username);
+  }
+}
+
+export async function fetchPostById(
+  postId: string,
+  accessToken?: string,
+): Promise<PostDetail | null> {
+  if (UseMockData) {
+    const mockPost = MockFeedData.find((post) => post.id === postId) ?? MockFeedData[0];
+    return {
+      id: mockPost.id,
+      caption: mockPost.caption,
+      createdAt: new Date().toISOString(),
+      user: {
+        username: mockPost.user.username,
+        profile: {
+          name: mockPost.user.name ?? mockPost.user.username,
+          bio: mockPost.user.bio ?? "Perfil de demonstracao",
+          avatarUrl: mockPost.user.avatarUrl,
+        },
+      },
+      media: mockPost.media,
+      likes: mockPost.likes.map((likeItem) => ({
+        id: likeItem.id,
+        user: {
+          username: "usuario",
+        },
+      })),
+      comments: [
+        {
+          id: "mock_comment_1",
+          content: "Muito bom esse post",
+          user: {
+            username: "amigo1",
+          },
+          replies: [
+            {
+              id: "mock_reply_1",
+              content: "Concordo",
+              user: {
+                username: "amigo2",
+              },
+            },
+          ],
+        },
+      ],
+    };
+  }
+  try {
+    const response = await apiClient.get<PostDetail>(`/posts/${postId}`, {
+      headers: accessToken
+        ? {
+            Authorization: `Bearer ${accessToken}`,
+          }
+        : undefined,
+    });
+    return response.data;
+  } catch {
+    return null;
   }
 }
