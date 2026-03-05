@@ -15,11 +15,11 @@ export default async function Home() {
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
             <div>
               <p className="inline-flex rounded-full border border-borderColor bg-background px-3 py-1 text-xs text-muted">
-                PlataformaParaPortfolio
+                Plataforma para portfolio
               </p>
               <h1 className="mt-4 text-3xl font-semibold leading-snug text-primaryActive md:text-4xl md:leading-[1.2]">
-                <span className="block">ConstruaSeuPerfil</span>
-                <span className="mt-2 block">EMostreSeuTrabalho</span>
+                <span className="block">Construa seu perfil</span>
+                <span className="mt-2 block">e mostre seu trabalho</span>
               </h1>
               <p className="mt-4 max-w-xl text-sm text-muted md:text-base">
                 Rede social focada em criacao de perfil publico, posts com imagem ou video,
@@ -31,12 +31,12 @@ export default async function Home() {
                   href="/feed"
                   className="rounded-md border border-borderColor bg-background px-4 py-2 text-sm font-medium text-foreground transition hover:border-primary"
                 >
-                  ExplorarFeed
+                  Explorar feed
                 </Link>
               </div>
             </div>
             <div className="rounded-xl border border-borderColor bg-background p-5">
-              <h2 className="text-lg font-semibold text-primaryActive">ComeceEm3Passos</h2>
+              <h2 className="text-lg font-semibold text-primaryActive">Comece em 3 passos</h2>
               <ol className="mt-4 space-y-3 text-sm text-muted">
                 <li className="rounded-lg border border-borderColor bg-surface p-3">
                   <b className="text-foreground">1.</b> Crie sua conta com Google em um clique
@@ -57,7 +57,7 @@ export default async function Home() {
             <div className="inline-flex rounded-md bg-primarySoft p-2 text-primary">
               <UserRoundCheck size={18} />
             </div>
-            <h3 className="mt-3 text-base font-semibold">PerfilPublico</h3>
+            <h3 className="mt-3 text-base font-semibold">Perfil publico</h3>
             <p className="mt-2 text-sm text-muted">
               Use seu username unico para compartilhar um link limpo do seu perfil.
             </p>
@@ -66,7 +66,7 @@ export default async function Home() {
             <div className="inline-flex rounded-md bg-primarySoft p-2 text-primary">
               <Camera size={18} />
             </div>
-            <h3 className="mt-3 text-base font-semibold">PostsComMidia</h3>
+            <h3 className="mt-3 text-base font-semibold">Posts com midia</h3>
             <p className="mt-2 text-sm text-muted">
               Poste fotos e videos com visual de feed moderno e foco em portfolio.
             </p>
