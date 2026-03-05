@@ -7,7 +7,7 @@ import {
   fetchProfilePosts,
   type FeedPost,
 } from "@/lib/api";
-import { Album, FileImage, ImageIcon, Pencil, UserPlus, UserRound } from "lucide-react";
+import { FileImage, ImageIcon, Pencil, UserPlus, UserRound } from "lucide-react";
 
 type ProfilePageProps = {
   params: Promise<{ username: string }>;
@@ -86,6 +86,9 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
               <p className="mt-3 max-w-3xl text-sm">
                 {profile?.bio ?? "Perfil em construcao para o portfolio LessSocial."}
               </p>
+              <p className="mt-2 text-xs text-muted">
+                Albuns: <b className="text-foreground">{albumCount}</b>
+              </p>
               <div className="mt-4 flex flex-wrap gap-5 text-sm text-muted">
                 <span className="inline-flex items-center gap-2">
                   <FileImage size={14} />
@@ -94,10 +97,6 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                 <span className="inline-flex items-center gap-2">
                   <ImageIcon size={14} />
                   <b className="text-foreground">{mediaCount}</b> Midias
-                </span>
-                <span className="inline-flex items-center gap-2">
-                  <Album size={14} />
-                  <b className="text-foreground">{albumCount}</b> Albuns
                 </span>
               </div>
             </div>
@@ -123,51 +122,6 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
           )}
         </section>
 
-        <section className="rounded-2xl border border-borderColor bg-surface p-5">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="inline-flex items-center gap-2 text-lg font-semibold">
-              <Album size={18} />
-              Albuns
-            </h2>
-            <span className="text-sm text-muted">{albumCount} itens</span>
-          </div>
-          {albums.length === 0 ? (
-            <p className="text-sm text-muted">Nenhum album criado ainda.</p>
-          ) : (
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {albums.slice(0, 4).map((albumItem: { id: string; name: string; items?: { id: string; mediaType: "image" | "video"; mediaUrl: string }[] }) => {
-                const firstItem = albumItem.items?.[0];
-                return (
-                  <div key={albumItem.id} className="overflow-hidden rounded-xl border border-borderColor bg-background">
-                    {firstItem ? (
-                      firstItem.mediaType === "image" ? (
-                        <img
-                          src={firstItem.mediaUrl}
-                          alt={`Album${albumItem.id}`}
-                          className="h-36 w-full object-cover"
-                        />
-                      ) : (
-                        <video className="h-36 w-full object-cover" muted>
-                          <source src={firstItem.mediaUrl} />
-                        </video>
-                      )
-                    ) : (
-                      <div className="flex h-36 items-center justify-center text-sm text-muted">
-                        SemMidia
-                      </div>
-                    )}
-                    <div className="p-3">
-                      <p className="font-medium">{albumItem.name}</p>
-                      <p className="text-xs text-muted">
-                        {albumItem.items?.length ?? 0} midias
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </section>
       </main>
     </div>
   );
