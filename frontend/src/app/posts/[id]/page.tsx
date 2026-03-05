@@ -34,6 +34,8 @@ export default async function PostDetailsPage({ params }: PostDetailsPageProps) 
     month: "2-digit",
     year: "numeric",
   });
+  const visibleLikes = post.likes.slice(0, 3);
+  const hiddenLikesCount = Math.max(post.likes.length - visibleLikes.length, 0);
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-background text-foreground">
@@ -113,7 +115,7 @@ export default async function PostDetailsPage({ params }: PostDetailsPageProps) 
                   <p className="text-sm text-muted">Nenhuma curtida ainda.</p>
                 ) : (
                   <div className="flex flex-wrap gap-2">
-                    {post.likes.slice(0, 12).map((likeItem) => (
+                    {visibleLikes.map((likeItem) => (
                       <span
                         key={likeItem.id}
                         className="rounded-full border border-borderColor bg-background px-3 py-1 text-xs text-foreground"
@@ -121,6 +123,11 @@ export default async function PostDetailsPage({ params }: PostDetailsPageProps) 
                         @{likeItem.user.username}
                       </span>
                     ))}
+                    {hiddenLikesCount > 0 ? (
+                      <span className="rounded-full border border-borderColor bg-background px-3 py-1 text-xs text-muted">
+                        +{hiddenLikesCount} outrasCurtidas
+                      </span>
+                    ) : null}
                   </div>
                 )}
               </div>
