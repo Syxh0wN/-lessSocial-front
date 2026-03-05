@@ -1,8 +1,16 @@
 import axios from "axios";
+import {
+  BuildMockProfileAlbumsData,
+  BuildMockProfileData,
+  BuildMockProfilePostsData,
+  MockFeedData,
+} from "./mockData";
 
 export const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000/api",
 });
+
+const UseMockData = process.env.NEXT_PUBLIC_USE_MOCK_DATA === "true";
 
 export type FeedPost = {
   id: string;
@@ -20,21 +28,49 @@ export type FeedPost = {
 };
 
 export async function fetchFeed(): Promise<FeedPost[]> {
-  const response = await apiClient.get<FeedPost[]>("/feed");
-  return response.data;
+  if (UseMockData) {
+    return MockFeedData;
+  }
+  try {
+    const response = await apiClient.get<FeedPost[]>("/feed");
+    return response.data;
+  } catch {
+    return MockFeedData;
+  }
 }
 
 export async function fetchProfile(username: string) {
-  const response = await apiClient.get(`/profiles/${username}`);
-  return response.data;
+  if (UseMockData) {
+    return BuildMockProfileData(username);
+  }
+  try {
+    const response = await apiClient.get(`/profiles/${username}`);
+    return response.data;
+  } catch {
+    return BuildMockProfileData(username);
+  }
 }
 
 export async function fetchProfilePosts(username: string) {
-  const response = await apiClient.get(`/profiles/${username}/posts`);
-  return response.data;
+  if (UseMockData) {
+    return BuildMockProfilePostsData(username);
+  }
+  try {
+    const response = await apiClient.get(`/profiles/${username}/posts`);
+    return response.data;
+  } catch {
+    return BuildMockProfilePostsData(username);
+  }
 }
 
 export async function fetchProfileAlbums(username: string) {
-  const response = await apiClient.get(`/profiles/${username}/albums`);
-  return response.data;
+  if (UseMockData) {
+    return BuildMockProfileAlbumsData(username);
+  }
+  try {
+    const response = await apiClient.get(`/profiles/${username}/albums`);
+    return response.data;
+  } catch {
+    return BuildMockProfileAlbumsData(username);
+  }
 }
