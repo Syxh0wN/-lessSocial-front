@@ -35,6 +35,24 @@ export type FeedPost = {
   comments: Array<{ id: string }>;
 };
 
+export type ProfileResponse = {
+  id: string;
+  userId: string;
+  name: string;
+  bio?: string;
+  avatarUrl?: string;
+  instagramUrl?: string;
+  facebookUrl?: string;
+  youtubeUrl?: string;
+  xUrl?: string;
+  twitchUrl?: string;
+  kickUrl?: string;
+  user: {
+    id: string;
+    username: string;
+  };
+};
+
 export type PostDetail = {
   id: string;
   caption: string | null;
@@ -95,12 +113,12 @@ export async function fetchFeed(accessToken?: string): Promise<FeedPost[]> {
   }
 }
 
-export async function fetchProfile(username: string) {
+export async function fetchProfile(username: string): Promise<ProfileResponse> {
   if (UseMockData) {
     return BuildMockProfileData(username);
   }
   try {
-    const response = await apiClient.get(`/profiles/${username}`);
+    const response = await apiClient.get<ProfileResponse>(`/profiles/${username}`);
     return response.data;
   } catch {
     return BuildMockProfileData(username);

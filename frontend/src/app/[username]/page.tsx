@@ -7,7 +7,17 @@ import {
   fetchProfilePosts,
   type FeedPost,
 } from "@/lib/api";
-import { FileImage, ImageIcon, Pencil, UserPlus, UserRound } from "lucide-react";
+import {
+  Facebook,
+  FileImage,
+  ImageIcon,
+  Instagram,
+  Pencil,
+  Twitch,
+  UserPlus,
+  UserRound,
+  Youtube,
+} from "lucide-react";
 
 type ProfilePageProps = {
   params: Promise<{ username: string }>;
@@ -32,6 +42,52 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   const coverImage =
     "https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=1400&auto=format&fit=crop";
   const isOwnProfile = currentUsername === username;
+  const socialLinks = [
+    {
+      key: "instagram",
+      href: profile?.instagramUrl,
+      label: "Instagram",
+      icon: <Instagram size={16} />,
+    },
+    {
+      key: "facebook",
+      href: profile?.facebookUrl,
+      label: "Facebook",
+      icon: <Facebook size={16} />,
+    },
+    {
+      key: "youtube",
+      href: profile?.youtubeUrl,
+      label: "Youtube",
+      icon: <Youtube size={16} />,
+    },
+    {
+      key: "x",
+      href: profile?.xUrl,
+      label: "X",
+      icon: (
+        <span className="inline-flex h-4 w-4 items-center justify-center text-[10px] font-bold">
+          X
+        </span>
+      ),
+    },
+    {
+      key: "twitch",
+      href: profile?.twitchUrl,
+      label: "Twitch",
+      icon: <Twitch size={16} />,
+    },
+    {
+      key: "kick",
+      href: profile?.kickUrl,
+      label: "Kick",
+      icon: (
+        <span className="inline-flex h-4 w-4 items-center justify-center text-[10px] font-bold">
+          K
+        </span>
+      ),
+    },
+  ].filter((socialItem) => Boolean(socialItem.href));
   const profileFeedPosts: FeedPost[] = posts.map(
     (postItem: {
       id: string;
@@ -86,6 +142,23 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
               <p className="mt-3 max-w-3xl text-sm">
                 {profile?.bio ?? "Perfil em construcao para o portfolio LessSocial."}
               </p>
+              {socialLinks.length > 0 ? (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {socialLinks.map((socialItem) => (
+                    <a
+                      key={socialItem.key}
+                      href={socialItem.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-borderColor bg-background text-muted transition hover:border-primary hover:text-primary"
+                      aria-label={socialItem.label}
+                      title={socialItem.label}
+                    >
+                      {socialItem.icon}
+                    </a>
+                  ))}
+                </div>
+              ) : null}
               <p className="mt-2 text-xs text-muted">
                 Albuns: <b className="text-foreground">{albumCount}</b>
               </p>

@@ -10,6 +10,12 @@ export const UpdateProfileSchema = z.object({
   name: z.string().min(2).max(80),
   bio: z.string().max(180).optional(),
   avatarUrl: z.string().url().optional(),
+  instagramUrl: z.string().url().optional(),
+  facebookUrl: z.string().url().optional(),
+  youtubeUrl: z.string().url().optional(),
+  xUrl: z.string().url().optional(),
+  twitchUrl: z.string().url().optional(),
+  kickUrl: z.string().url().optional(),
 });
 
 export const CreatePostSchema = z.object({

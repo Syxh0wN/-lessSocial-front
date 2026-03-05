@@ -6,6 +6,12 @@ export type ProfileData = {
   name: string;
   bio: string;
   avatarUrl: string;
+  instagramUrl?: string;
+  facebookUrl?: string;
+  youtubeUrl?: string;
+  xUrl?: string;
+  twitchUrl?: string;
+  kickUrl?: string;
   user: {
     id: string;
     username: string;
@@ -87,6 +93,9 @@ export function BuildMockProfileData(username: string): ProfileData {
     bio: "Perfil de demonstracao para ambiente sem deploy.",
     avatarUrl:
       "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=800&auto=format&fit=crop",
+    instagramUrl: "https://instagram.com/eusouleo",
+    youtubeUrl: "https://youtube.com/@eusouleo",
+    xUrl: "https://x.com/eusouleo",
     user: {
       id: `user_${username}`,
       username,
