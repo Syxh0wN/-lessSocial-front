@@ -183,6 +183,28 @@ export function buildMockFeedPage(cursor?: string, limit = 10): FeedPageResponse
 
 export async function fetchProfile(username: string): Promise<ProfileResponse> {
   if (UseMockData) {
+    const feedUser = MockFeedData.find(
+      (postItem) => postItem.user.username === username,
+    )?.user;
+    if (feedUser) {
+      return {
+        id: `profile_${username}`,
+        userId: `user_${username}`,
+        name: feedUser.name ?? username,
+        bio: feedUser.bio ?? "Perfil de demonstracao para ambiente sem deploy.",
+        avatarUrl: feedUser.avatarUrl,
+        instagramUrl: feedUser.profile?.instagramUrl,
+        facebookUrl: feedUser.profile?.facebookUrl,
+        youtubeUrl: feedUser.profile?.youtubeUrl,
+        xUrl: feedUser.profile?.xUrl,
+        twitchUrl: feedUser.profile?.twitchUrl,
+        kickUrl: feedUser.profile?.kickUrl,
+        user: {
+          id: `user_${username}`,
+          username,
+        },
+      };
+    }
     return BuildMockProfileData(username);
   }
   try {
@@ -195,6 +217,18 @@ export async function fetchProfile(username: string): Promise<ProfileResponse> {
 
 export async function fetchProfilePosts(username: string) {
   if (UseMockData) {
+    const postsFromFeed = MockFeedData.filter(
+      (postItem) => postItem.user.username === username,
+    ).map((postItem) => ({
+      id: postItem.id,
+      caption: postItem.caption,
+      media: postItem.media,
+      likes: postItem.likes,
+      comments: postItem.comments,
+    }));
+    if (postsFromFeed.length > 0) {
+      return postsFromFeed;
+    }
     return BuildMockProfilePostsData(username);
   }
   try {
