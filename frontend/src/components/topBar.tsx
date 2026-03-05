@@ -13,8 +13,8 @@ export function TopBar({ username }: TopBarProps) {
           LessSocial
         </Link>
         <nav className="flex items-center gap-4 text-sm">
-          <Link href="/feed">Feed</Link>
           <NotificationsBell />
+          <Link href="/feed">Feed</Link>
           {username ? <Link href={`/${username}`}>Perfil</Link> : null}
           <Link href="/me">MinhaConta</Link>
         </nav>

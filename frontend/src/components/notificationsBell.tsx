@@ -58,7 +58,7 @@ export function NotificationsBell() {
     <div className="relative">
       <button
         onClick={() => setIsOpen((currentValue) => !currentValue)}
-        className="relative inline-flex h-9 w-9 items-center justify-center rounded-full border border-borderColor bg-background text-muted transition hover:border-primary hover:text-primary"
+        className="relative inline-flex h-8 w-8 items-center justify-center rounded-md text-muted transition hover:text-primary"
         aria-label="Notificacoes"
       >
         <Bell size={16} />
