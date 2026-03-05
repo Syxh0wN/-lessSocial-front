@@ -1,6 +1,7 @@
 import { TopBar } from "@/components/topBar";
 import { auth } from "@/auth";
 import { fetchProfile, fetchProfileAlbums, fetchProfilePosts } from "@/lib/api";
+import { Album, FileImage, ImageIcon, Pencil, UserPlus, UserRound } from "lucide-react";
 
 type ProfilePageProps = {
   params: Promise<{ username: string }>;
@@ -43,11 +44,15 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                 className="h-24 w-24 rounded-full border-4 border-surface object-cover md:h-28 md:w-28"
               />
               <button className="rounded-full border border-borderColor bg-background px-4 py-2 text-sm font-medium text-foreground transition hover:bg-primarySoft">
-                {isOwnProfile ? "EditarPerfil" : "Seguir"}
+                <span className="inline-flex items-center gap-2">
+                  {isOwnProfile ? <Pencil size={14} /> : <UserPlus size={14} />}
+                  {isOwnProfile ? "EditarPerfil" : "Seguir"}
+                </span>
               </button>
             </div>
             <div className="mt-4">
-              <h1 className="text-2xl font-semibold text-primaryActive">
+              <h1 className="inline-flex items-center gap-2 text-2xl font-semibold text-primaryActive">
+                <UserRound size={22} />
                 {profile?.name ?? username}
               </h1>
               <p className="text-sm text-muted">@{username}</p>
@@ -55,13 +60,16 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                 {profile?.bio ?? "Perfil em construcao para o portfolio LessSocial."}
               </p>
               <div className="mt-4 flex flex-wrap gap-5 text-sm text-muted">
-                <span>
+                <span className="inline-flex items-center gap-2">
+                  <FileImage size={14} />
                   <b className="text-foreground">{postCount}</b> Posts
                 </span>
-                <span>
+                <span className="inline-flex items-center gap-2">
+                  <ImageIcon size={14} />
                   <b className="text-foreground">{mediaCount}</b> Midias
                 </span>
-                <span>
+                <span className="inline-flex items-center gap-2">
+                  <Album size={14} />
                   <b className="text-foreground">{albumCount}</b> Albuns
                 </span>
               </div>
@@ -71,7 +79,10 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
         <section className="rounded-2xl border border-borderColor bg-surface p-5">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold">PostsRecentes</h2>
+            <h2 className="inline-flex items-center gap-2 text-lg font-semibold">
+              <FileImage size={18} />
+              PostsRecentes
+            </h2>
             <span className="text-sm text-muted">{postCount} itens</span>
           </div>
           {posts.length === 0 ? (
@@ -115,7 +126,10 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
         <section className="rounded-2xl border border-borderColor bg-surface p-5">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Albuns</h2>
+            <h2 className="inline-flex items-center gap-2 text-lg font-semibold">
+              <Album size={18} />
+              Albuns
+            </h2>
             <span className="text-sm text-muted">{albumCount} itens</span>
           </div>
           {albums.length === 0 ? (
