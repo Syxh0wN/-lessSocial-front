@@ -35,6 +35,12 @@ export type FeedPost = {
   comments: Array<{ id: string }>;
 };
 
+export type FeedPageResponse = {
+  items: FeedPost[];
+  nextCursor: string | null;
+  hasMore: boolean;
+};
+
 export type ProfileResponse = {
   id: string;
   userId: string;
@@ -96,11 +102,24 @@ export type PostDetail = {
 };
 
 export async function fetchFeed(accessToken?: string): Promise<FeedPost[]> {
+  const firstPage = await fetchFeedPage(undefined, 10, accessToken);
+  return firstPage.items;
+}
+
+export async function fetchFeedPage(
+  cursor?: string,
+  limit = 10,
+  accessToken?: string,
+): Promise<FeedPageResponse> {
   if (UseMockData) {
-    return MockFeedData;
+    return buildMockFeedPage(cursor, limit);
   }
   try {
-    const response = await apiClient.get<FeedPost[]>("/feed", {
+    const response = await apiClient.get<FeedPageResponse>("/feed", {
+      params: {
+        cursor,
+        limit,
+      },
       headers: accessToken
         ? {
             Authorization: `Bearer ${accessToken}`,
@@ -109,8 +128,23 @@ export async function fetchFeed(accessToken?: string): Promise<FeedPost[]> {
     });
     return response.data;
   } catch {
-    return MockFeedData;
+    return buildMockFeedPage(cursor, limit);
   }
+}
+
+export function buildMockFeedPage(cursor?: string, limit = 10): FeedPageResponse {
+  const safeLimit = Math.min(Math.max(limit, 1), 20);
+  const startIndex = Number.parseInt(cursor ?? "0", 10);
+  const safeStartIndex = Number.isNaN(startIndex) ? 0 : Math.max(startIndex, 0);
+  const endIndex = safeStartIndex + safeLimit;
+  const items = MockFeedData.slice(safeStartIndex, endIndex);
+  const hasMore = endIndex < MockFeedData.length;
+  const nextCursor = hasMore ? String(endIndex) : null;
+  return {
+    items,
+    nextCursor,
+    hasMore,
+  };
 }
 
 export async function fetchProfile(username: string): Promise<ProfileResponse> {
