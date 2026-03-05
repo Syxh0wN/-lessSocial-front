@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { NotificationsBell } from "@/components/notificationsBell";
 
 type TopBarProps = {
   username?: string;
@@ -13,6 +14,7 @@ export function TopBar({ username }: TopBarProps) {
         </Link>
         <nav className="flex items-center gap-4 text-sm">
           <Link href="/feed">Feed</Link>
+          <NotificationsBell />
           {username ? <Link href={`/${username}`}>Perfil</Link> : null}
           <Link href="/me">MinhaConta</Link>
         </nav>

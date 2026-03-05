@@ -48,6 +48,20 @@ export type FeedPageResponse = {
   hasMore: boolean;
 };
 
+export type NotificationItem = {
+  id: string;
+  type: "postLike" | "postComment" | "friendRequest" | "testimonial";
+  createdAt: string;
+  actorUsername: string;
+  message: string;
+  targetId?: string;
+};
+
+export type NotificationsResponse = {
+  items: NotificationItem[];
+  unreadCount: number;
+};
+
 export type TestimonialResponse = {
   id: string;
   content: string;
@@ -275,5 +289,55 @@ export async function fetchPostById(
     return response.data;
   } catch {
     return null;
+  }
+}
+
+export async function fetchNotifications(
+  accessToken?: string,
+): Promise<NotificationsResponse> {
+  if (UseMockData) {
+    return {
+      unreadCount: 3,
+      items: [
+        {
+          id: "mock_notification_1",
+          type: "postLike",
+          createdAt: new Date().toISOString(),
+          actorUsername: "mariaDev",
+          message: "curtiu sua postagem",
+          targetId: "post_1",
+        },
+        {
+          id: "mock_notification_2",
+          type: "postComment",
+          createdAt: new Date().toISOString(),
+          actorUsername: "joaoTech",
+          message: "comentou na sua postagem",
+          targetId: "post_1",
+        },
+        {
+          id: "mock_notification_3",
+          type: "testimonial",
+          createdAt: new Date().toISOString(),
+          actorUsername: "carolSys",
+          message: "enviou um depoimento para voce",
+        },
+      ],
+    };
+  }
+  try {
+    const response = await apiClient.get<NotificationsResponse>("/notifications", {
+      headers: accessToken
+        ? {
+            Authorization: `Bearer ${accessToken}`,
+          }
+        : undefined,
+    });
+    return response.data;
+  } catch {
+    return {
+      unreadCount: 0,
+      items: [],
+    };
   }
 }
