@@ -29,6 +29,11 @@ export default async function PostDetailsPage({ params }: PostDetailsPageProps) 
   }
 
   const firstMedia = post.media[0];
+  const postDateLabel = new Date(post.createdAt).toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-background text-foreground">
@@ -62,6 +67,7 @@ export default async function PostDetailsPage({ params }: PostDetailsPageProps) 
                 <p className="text-xs text-muted">
                   {post.user.profile?.name ?? "Usuario"}
                 </p>
+                <p className="text-[10px] text-muted/80">{postDateLabel}</p>
               </div>
             </div>
             <Link href="/feed" className="rounded-md p-2 transition hover:bg-primarySoft">
