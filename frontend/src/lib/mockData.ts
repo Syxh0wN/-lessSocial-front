@@ -83,6 +83,126 @@ export const MockFeedData: FeedPost[] = [
     likes: [{ id: "like_4" }],
     comments: [{ id: "comment_3" }],
   },
+  {
+    id: "post_3",
+    caption: "Treino de backend finalizado hoje",
+    user: {
+      username: "marinaCode",
+      name: "Marina Code",
+      bio: "API, testes e performance",
+      avatarUrl:
+        "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=300&auto=format&fit=crop",
+    },
+    media: [
+      {
+        id: "media_3",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?q=80&w=1200&auto=format&fit=crop",
+      },
+    ],
+    likes: [{ id: "like_5" }, { id: "like_6" }],
+    comments: [{ id: "comment_4" }, { id: "comment_5" }],
+  },
+  {
+    id: "post_4",
+    caption: "Novo setup para stream e pair programming",
+    user: {
+      username: "gabrielLive",
+      name: "Gabriel Live",
+      bio: "Coding e streaming diario",
+      avatarUrl:
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=300&auto=format&fit=crop",
+    },
+    media: [
+      {
+        id: "media_4",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1598550476439-6847785fcea6?q=80&w=1200&auto=format&fit=crop",
+      },
+    ],
+    likes: [{ id: "like_7" }],
+    comments: [{ id: "comment_6" }],
+  },
+  {
+    id: "post_5",
+    caption: "Deploy da semana no ar",
+    user: {
+      username: "anaDevOps",
+      name: "Ana DevOps",
+      bio: "Cloud, CI e automacao",
+      avatarUrl:
+        "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?q=80&w=300&auto=format&fit=crop",
+    },
+    media: [
+      {
+        id: "media_5",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1200&auto=format&fit=crop",
+      },
+    ],
+    likes: [{ id: "like_8" }, { id: "like_9" }, { id: "like_10" }],
+    comments: [{ id: "comment_7" }, { id: "comment_8" }],
+  },
+  {
+    id: "post_6",
+    caption: "Interface nova do app pronta para review",
+    user: {
+      username: "uxleo",
+      name: "Leo UX",
+      bio: "UI limpa e experiencia simples",
+      avatarUrl:
+        "https://images.unsplash.com/photo-1521119989659-a83eee488004?q=80&w=300&auto=format&fit=crop",
+    },
+    media: [
+      {
+        id: "media_6",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop",
+      },
+    ],
+    likes: [{ id: "like_11" }, { id: "like_12" }],
+    comments: [{ id: "comment_9" }],
+  },
+  {
+    id: "post_7",
+    caption: "Sessao de estudo de arquitetura hoje a noite",
+    user: {
+      username: "carolSys",
+      name: "Carol Systems",
+      bio: "Arquitetura e escalabilidade",
+      avatarUrl:
+        "https://images.unsplash.com/photo-1542204625-de293a05b0d3?q=80&w=300&auto=format&fit=crop",
+    },
+    media: [
+      {
+        id: "media_7",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?q=80&w=1200&auto=format&fit=crop",
+      },
+    ],
+    likes: [{ id: "like_13" }],
+    comments: [{ id: "comment_10" }, { id: "comment_11" }],
+  },
+  {
+    id: "post_8",
+    caption: "Checklist de seguranca aplicado no projeto",
+    user: {
+      username: "secbruno",
+      name: "Bruno Security",
+      bio: "Seguranca de aplicacoes web",
+      avatarUrl:
+        "https://images.unsplash.com/photo-1552374196-c4e7ffc6e126?q=80&w=300&auto=format&fit=crop",
+    },
+    media: [
+      {
+        id: "media_8",
+        type: "image",
+        url: "https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=1200&auto=format&fit=crop",
+      },
+    ],
+    likes: [{ id: "like_14" }, { id: "like_15" }, { id: "like_16" }],
+    comments: [{ id: "comment_12" }],
+  },
 ];
 
 export function BuildMockProfileData(username: string): ProfileData {
