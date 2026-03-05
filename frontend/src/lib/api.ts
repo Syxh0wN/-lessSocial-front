@@ -153,7 +153,7 @@ export async function fetchPostById(
       likes: mockPost.likes.map((likeItem) => ({
         id: likeItem.id,
         user: {
-          username: "usuario",
+          username: likeItem.id === "like_1" ? "maria" : likeItem.id === "like_2" ? "joao" : "carol",
         },
       })),
       comments: [

@@ -99,21 +99,48 @@ export default async function PostDetailsPage({ params }: PostDetailsPageProps) 
                 </div>
               </div>
 
-              <div className="flex-1 overflow-y-auto px-5 py-4">
-                {post.comments.map((commentItem) => (
-                  <div key={commentItem.id} className="mb-4">
-                    <p className="text-sm">
-                      <span className="font-semibold">@{commentItem.user.username}</span>{" "}
-                      {commentItem.content}
-                    </p>
-                    {commentItem.replies.map((replyItem) => (
-                      <p key={replyItem.id} className="ml-4 mt-1 text-xs text-muted">
-                        <span className="font-semibold">@{replyItem.user.username}</span>{" "}
-                        {replyItem.content}
-                      </p>
+              <div className="border-b border-borderColor px-5 py-4">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">
+                  QuemCurtiu
+                </p>
+                {post.likes.length === 0 ? (
+                  <p className="text-sm text-muted">Nenhuma curtida ainda.</p>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {post.likes.slice(0, 12).map((likeItem) => (
+                      <span
+                        key={likeItem.id}
+                        className="rounded-full border border-borderColor bg-background px-3 py-1 text-xs text-foreground"
+                      >
+                        @{likeItem.user.username}
+                      </span>
                     ))}
                   </div>
-                ))}
+                )}
+              </div>
+
+              <div className="flex-1 overflow-y-auto px-5 py-4">
+                <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted">
+                  Comentarios
+                </p>
+                {post.comments.length === 0 ? (
+                  <p className="text-sm text-muted">Ainda nao ha comentarios nesta postagem.</p>
+                ) : (
+                  post.comments.map((commentItem) => (
+                    <div key={commentItem.id} className="mb-4">
+                      <p className="text-sm">
+                        <span className="font-semibold">@{commentItem.user.username}</span>{" "}
+                        {commentItem.content}
+                      </p>
+                      {commentItem.replies.map((replyItem) => (
+                        <p key={replyItem.id} className="ml-4 mt-1 text-xs text-muted">
+                          <span className="font-semibold">@{replyItem.user.username}</span>{" "}
+                          {replyItem.content}
+                        </p>
+                      ))}
+                    </div>
+                  ))
+                )}
               </div>
             </section>
           </div>
