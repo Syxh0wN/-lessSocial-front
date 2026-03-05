@@ -5,6 +5,7 @@ import {
   fetchProfile,
   fetchProfileAlbums,
   fetchProfilePosts,
+  fetchProfileTestimonials,
   type FeedPost,
 } from "@/lib/api";
 import {
@@ -18,20 +19,29 @@ import {
   UserRound,
   Youtube,
 } from "lucide-react";
+import Link from "next/link";
 
 type ProfilePageProps = {
   params: Promise<{ username: string }>;
+  searchParams: Promise<{ tab?: string }>;
 };
 
-export default async function ProfilePage({ params }: ProfilePageProps) {
+export default async function ProfilePage({
+  params,
+  searchParams,
+}: ProfilePageProps) {
   const { username } = await params;
+  const query = await searchParams;
+  const activeTab = query.tab === "depoimentos" ? "depoimentos" : "posts";
   const session = await auth();
   const currentUsername = (session?.user as { username?: string } | undefined)?.username;
   const profile = await fetchProfile(username).catch(() => null);
   const posts = await fetchProfilePosts(username).catch(() => []);
   const albums = await fetchProfileAlbums(username).catch(() => []);
+  const testimonials = await fetchProfileTestimonials(username).catch(() => []);
   const postCount = posts.length;
   const albumCount = albums.length;
+  const testimonialCount = testimonials.length;
   const mediaCount = posts.reduce(
     (total: number, postItem: { media?: unknown[] }) => total + (postItem.media?.length ?? 0),
     0,
@@ -162,6 +172,10 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
               <p className="mt-2 text-xs text-muted">
                 Albuns: <b className="text-foreground">{albumCount}</b>
               </p>
+              <p className="mt-1 text-xs text-muted">
+                Depoimentos:{" "}
+                <b className="text-foreground">{testimonialCount}</b>
+              </p>
               <div className="mt-4 flex flex-wrap gap-5 text-sm text-muted">
                 <span className="inline-flex items-center gap-2">
                   <FileImage size={14} />
@@ -172,11 +186,68 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                   <b className="text-foreground">{mediaCount}</b> Midias
                 </span>
               </div>
+              <div className="mt-4 flex items-center gap-2">
+                <Link
+                  href={`/${username}`}
+                  className={`rounded-full px-3 py-1 text-xs transition ${
+                    activeTab === "posts"
+                      ? "bg-primary text-white"
+                      : "border border-borderColor bg-background text-muted hover:border-primary"
+                  }`}
+                >
+                  Posts
+                </Link>
+                <Link
+                  href={`/${username}?tab=depoimentos`}
+                  className={`rounded-full px-3 py-1 text-xs transition ${
+                    activeTab === "depoimentos"
+                      ? "bg-primary text-white"
+                      : "border border-borderColor bg-background text-muted hover:border-primary"
+                  }`}
+                >
+                  Depoimentos
+                </Link>
+              </div>
             </div>
           </div>
         </section>
 
-        {posts.length === 0 ? (
+        {activeTab === "depoimentos" ? (
+          testimonials.length === 0 ? (
+            <div className="rounded-2xl border border-borderColor bg-surface p-5 text-sm text-muted">
+              Nenhum depoimento aceito ainda.
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {testimonials.map((testimonialItem) => (
+                <article
+                  key={testimonialItem.id}
+                  className="rounded-2xl border border-borderColor bg-surface p-4"
+                >
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={
+                        testimonialItem.fromUser.profile?.avatarUrl ??
+                        "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=300&auto=format&fit=crop"
+                      }
+                      alt={`Depoimento${testimonialItem.fromUser.username}`}
+                      className="h-10 w-10 rounded-full border border-borderColor object-cover"
+                    />
+                    <div>
+                      <p className="text-sm font-semibold">
+                        @{testimonialItem.fromUser.username}
+                      </p>
+                      <p className="text-[11px] text-muted">
+                        {new Date(testimonialItem.createdAt).toLocaleDateString("pt-BR")}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="mt-3 text-sm text-foreground">{testimonialItem.content}</p>
+                </article>
+              ))}
+            </div>
+          )
+        ) : posts.length === 0 ? (
           <div className="rounded-2xl border border-borderColor bg-surface p-5 text-sm text-muted">
             Nenhum post publicado ainda.
           </div>

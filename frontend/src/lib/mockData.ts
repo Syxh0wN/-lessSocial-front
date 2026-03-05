@@ -40,6 +40,19 @@ export type AlbumData = {
   }>;
 };
 
+export type TestimonialData = {
+  id: string;
+  content: string;
+  createdAt: string;
+  fromUser: {
+    username: string;
+    profile?: {
+      name?: string;
+      avatarUrl?: string;
+    };
+  };
+};
+
 const BaseUsername = "eusouleo";
 
 export const MockFeedData: FeedPost[] = [
@@ -254,6 +267,37 @@ export function BuildMockProfileAlbumsData(username: string): AlbumData[] {
           mediaType: "image",
         },
       ],
+    },
+  ];
+}
+
+export function BuildMockTestimonialsData(username: string): TestimonialData[] {
+  return [
+    {
+      id: `testimonial_1_${username}`,
+      content: "Pessoa dedicada, parceira e com entrega sempre organizada.",
+      createdAt: new Date().toISOString(),
+      fromUser: {
+        username: "mariaDev",
+        profile: {
+          name: "Maria Dev",
+          avatarUrl:
+            "https://images.unsplash.com/photo-1544723795-3fb6469f5b39?q=80&w=300&auto=format&fit=crop",
+        },
+      },
+    },
+    {
+      id: `testimonial_2_${username}`,
+      content: "Excelente comunicacao e muita qualidade tecnica no projeto.",
+      createdAt: new Date().toISOString(),
+      fromUser: {
+        username: "joaoTech",
+        profile: {
+          name: "Joao Tech",
+          avatarUrl:
+            "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=300&auto=format&fit=crop",
+        },
+      },
     },
   ];
 }

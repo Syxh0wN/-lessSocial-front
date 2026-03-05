@@ -3,6 +3,7 @@ import {
   BuildMockProfileAlbumsData,
   BuildMockProfileData,
   BuildMockProfilePostsData,
+  BuildMockTestimonialsData,
   MockFeedData,
 } from "./mockData";
 
@@ -39,6 +40,19 @@ export type FeedPageResponse = {
   items: FeedPost[];
   nextCursor: string | null;
   hasMore: boolean;
+};
+
+export type TestimonialResponse = {
+  id: string;
+  content: string;
+  createdAt: string;
+  fromUser: {
+    username: string;
+    profile?: {
+      name?: string;
+      avatarUrl?: string;
+    };
+  };
 };
 
 export type ProfileResponse = {
@@ -180,6 +194,22 @@ export async function fetchProfileAlbums(username: string) {
     return response.data;
   } catch {
     return BuildMockProfileAlbumsData(username);
+  }
+}
+
+export async function fetchProfileTestimonials(
+  username: string,
+): Promise<TestimonialResponse[]> {
+  if (UseMockData) {
+    return BuildMockTestimonialsData(username);
+  }
+  try {
+    const response = await apiClient.get<TestimonialResponse[]>(
+      `/profiles/${username}/testimonials`,
+    );
+    return response.data;
+  } catch {
+    return BuildMockTestimonialsData(username);
   }
 }
 
