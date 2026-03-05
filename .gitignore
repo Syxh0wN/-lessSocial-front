@@ -1,2 +1,11 @@
 *.md
 .cursor/**/*.md
+.cursor/
+node_modules/
+frontend/.next/
+backend/dist/
+coverage/
+*.log
+.env
+.env.*
+!.env.example

@@ -1,0 +1,35 @@
+name: ci
+
+on:
+  pull_request:
+    branches:
+      - master
+      - main
+  push:
+    branches:
+      - master
+      - main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: setupNode
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: installDependencies
+        run: npm install
+      - name: checkNoMarkdown
+        run: npm run checkNoMarkdown
+      - name: lint
+        run: npm run lint
+      - name: typecheck
+        run: npm run typecheck
+      - name: test
+        run: npm run test
+      - name: build
+        run: npm run build

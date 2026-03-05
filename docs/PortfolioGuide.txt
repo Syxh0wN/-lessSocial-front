@@ -1,0 +1,26 @@
+Projeto: LessSocial
+
+Objetivo:
+Construir uma mini rede social fullstack com foco em portfolio.
+
+Fluxos principais:
+1. Login com Google
+2. Perfil publico por username
+3. Criar post com foto ou video
+4. Curtir e comentar post
+5. Enviar e moderar depoimento
+6. Gerenciar amizade
+
+Stack:
+- Frontend: Next.js TypeScript Tailwind
+- Backend: NestJS TypeScript Prisma
+- Banco: PostgreSQL
+- Auth: Google OAuth + JWT
+- Observabilidade: pino + endpoint health
+
+Roteiro de demo:
+1. Abrir home e autenticar com Google
+2. Visitar feed
+3. Abrir perfil publico por username
+4. Mostrar album e total de posts
+5. Mostrar endpoint de health no backend

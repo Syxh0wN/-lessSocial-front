@@ -1,0 +1,28 @@
+name: deploy
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: setupNode
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: installDependencies
+        run: npm install
+      - name: build
+        run: npm run build
+      - name: deployFrontend
+        run: echo DeployFrontendStep
+      - name: deployBackend
+        run: echo DeployBackendStep

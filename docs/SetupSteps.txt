@@ -1,0 +1,20 @@
+PassosDeSetupLocal
+
+1. Copiar backend/.env.example para backend/.env
+2. Copiar frontend/.env.example para frontend/.env.local
+3. Rodar npm install na raiz
+4. Rodar npm run prisma:generate --workspace backend
+5. Rodar npm run dev
+
+PassosDeHookLocal
+
+1. Configurar hook path local para .githooks
+2. Garantir execucao do arquivo .githooks/pre-commit
+3. Validar com npm run checkNoMarkdown
+
+PassosDeDeploy
+
+1. Criar banco PostgreSQL em nuvem
+2. Configurar variaveis de ambiente de backend e frontend
+3. Rodar pipeline CI
+4. Publicar frontend e backend

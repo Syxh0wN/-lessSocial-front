@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f5f8fb;
+  --surface: #e9eef3;
+  --foreground: #1e2a36;
+  --muted: #34516b;
+  --primary: #2c4256;
+  --primaryHover: #243444;
+  --primaryActive: #1e2a36;
+  --primarySoft: #dce7f1;
+  --borderColor: #d5dde6;
+  --successColor: #2f855a;
+  --warningColor: #c27803;
+  --errorColor: #c53030;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-primary: var(--primary);
+  --color-primaryHover: var(--primaryHover);
+  --color-primaryActive: var(--primaryActive);
+  --color-primarySoft: var(--primarySoft);
+  --color-borderColor: var(--borderColor);
+  --color-successColor: var(--successColor);
+  --color-warningColor: var(--warningColor);
+  --color-errorColor: var(--errorColor);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0f141a;
+    --surface: #141b24;
+    --foreground: #e9eef3;
+    --muted: #8ca7bf;
+    --primary: #34516b;
+    --primaryHover: #3d6181;
+    --primaryActive: #2c4256;
+    --primarySoft: #1d2733;
+    --borderColor: #2b3948;
+    --successColor: #2f855a;
+    --warningColor: #c27803;
+    --errorColor: #c53030;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), sans-serif;
+}
+
+a {
+  color: var(--primary);
+}
+
+a:hover {
+  color: var(--primaryHover);
+}
+
+button {
+  cursor: pointer;
+}

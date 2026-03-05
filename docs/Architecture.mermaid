@@ -1,0 +1,7 @@
+flowchart LR
+  userClient[UsuarioNoNavegador] --> frontendNext[FrontendNextJs]
+  frontendNext -->|"REST"| backendNest[BackendNestJs]
+  backendNest --> postgresDb[PostgreSql]
+  backendNest --> redisCache[RedisOpcional]
+  backendNest --> cloudinaryStorage[Cloudinary]
+  backendNest --> googleOAuth[GoogleOAuth]
