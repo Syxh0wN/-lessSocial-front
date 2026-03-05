@@ -122,12 +122,12 @@ export function ProfileTestimonialsTimeline({
       <div ref={sentinelRef} className="h-5" />
       {isLoadingMore ? (
         <div className="rounded-xl border border-borderColor bg-surface p-3 text-center text-xs text-muted">
-          CarregandoMaisDepoimentos
+          Carregando mais depoimentos
         </div>
       ) : null}
       {!hasMore ? (
         <div className="rounded-xl border border-borderColor bg-surface p-3 text-center text-xs text-muted">
-          FimDosDepoimentos
+          Fim dos depoimentos
         </div>
       ) : null}
     </div>

@@ -50,7 +50,7 @@ export type FeedPageResponse = {
 
 export type NotificationItem = {
   id: string;
-  type: "postLike" | "postComment" | "friendRequest" | "testimonial";
+  type: "postLike" | "postComment" | "friendRequest" | "testimonial" | "mention";
   createdAt: string;
   actorUsername: string;
   message: string;
@@ -87,6 +87,7 @@ export type ProfileResponse = {
   userId: string;
   name: string;
   bio?: string;
+  isPrivate: boolean;
   avatarUrl?: string;
   instagramUrl?: string;
   facebookUrl?: string;
@@ -98,12 +99,55 @@ export type ProfileResponse = {
     id: string;
     username: string;
   };
+  followersCount?: number;
+  followingCount?: number;
+  followers?: Array<{
+    username: string;
+    name: string;
+    avatarUrl?: string | null;
+  }>;
+  following?: Array<{
+    username: string;
+    name: string;
+    avatarUrl?: string | null;
+  }>;
+  recentVisitors?: Array<{
+    username: string;
+    avatarUrl?: string | null;
+    visitedAt: string;
+  }>;
+};
+
+export type ProfilePreviewResponse = {
+  username: string;
+  name: string;
+  bio?: string;
+  avatarUrl?: string | null;
+};
+
+export type ProfileSearchItem = {
+  userId?: string;
+  username: string;
+  name: string;
+  bio?: string | null;
+  avatarUrl?: string | null;
+};
+
+export type ProfileSuggestionItem = {
+  userId: string;
+  username: string;
+  name: string;
+  bio?: string | null;
+  avatarUrl?: string | null;
 };
 
 export type PostDetail = {
   id: string;
   caption: string | null;
   createdAt: string;
+  updatedAt: string;
+  likesCount: number;
+  viewerHasLiked: boolean;
   user: {
     username: string;
     profile?: {
@@ -121,11 +165,18 @@ export type PostDetail = {
     id: string;
     user: {
       username: string;
+      profile?: {
+        name?: string;
+        avatarUrl?: string;
+        bio?: string;
+      };
     };
   }>;
   comments: Array<{
     id: string;
     content: string;
+    createdAt: string;
+    updatedAt: string;
     user: {
       username: string;
       profile?: {
@@ -135,6 +186,8 @@ export type PostDetail = {
     replies: Array<{
       id: string;
       content: string;
+      createdAt: string;
+      updatedAt: string;
       user: {
         username: string;
       };
@@ -145,6 +198,30 @@ export type PostDetail = {
 export async function fetchFeed(accessToken?: string): Promise<FeedPost[]> {
   const firstPage = await fetchFeedPage(undefined, 10, accessToken);
   return firstPage.items;
+}
+
+export async function fetchHashtagPosts(
+  tag: string,
+  accessToken?: string,
+): Promise<FeedPost[]> {
+  if (UseMockData) {
+    const safeTag = tag.trim().toLowerCase();
+    return MockFeedData.filter((postItem) =>
+      (postItem.caption ?? "").toLowerCase().includes(`#${safeTag}`),
+    );
+  }
+  try {
+    const response = await apiClient.get<FeedPost[]>(`/hashtags/${encodeURIComponent(tag)}/posts`, {
+      headers: accessToken
+        ? {
+            Authorization: `Bearer ${accessToken}`,
+          }
+        : undefined,
+    });
+    return response.data;
+  } catch {
+    return [];
+  }
 }
 
 export async function fetchFeedPage(
@@ -169,7 +246,11 @@ export async function fetchFeedPage(
     });
     return response.data;
   } catch {
-    return buildMockFeedPage(cursor, limit);
+    return {
+      items: [],
+      nextCursor: null,
+      hasMore: false,
+    };
   }
 }
 
@@ -188,7 +269,10 @@ export function buildMockFeedPage(cursor?: string, limit = 10): FeedPageResponse
   };
 }
 
-export async function fetchProfile(username: string): Promise<ProfileResponse> {
+export async function fetchProfile(
+  username: string,
+  accessToken?: string,
+): Promise<ProfileResponse> {
   if (UseMockData) {
     const feedUser = MockFeedData.find(
       (postItem) => postItem.user.username === username,
@@ -199,6 +283,7 @@ export async function fetchProfile(username: string): Promise<ProfileResponse> {
         userId: `user_${username}`,
         name: feedUser.name ?? username,
         bio: feedUser.bio ?? "Perfil de demonstracao para ambiente sem deploy.",
+        isPrivate: false,
         avatarUrl: feedUser.avatarUrl,
         instagramUrl: feedUser.profile?.instagramUrl,
         facebookUrl: feedUser.profile?.facebookUrl,
@@ -210,19 +295,127 @@ export async function fetchProfile(username: string): Promise<ProfileResponse> {
           id: `user_${username}`,
           username,
         },
+        recentVisitors: [
+          {
+            username: "mariaDev",
+            avatarUrl:
+              "https://images.unsplash.com/photo-1544723795-3fb6469f5b39?q=80&w=300&auto=format&fit=crop",
+            visitedAt: new Date().toISOString(),
+          },
+          {
+            username: "joaoTech",
+            avatarUrl:
+              "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=300&auto=format&fit=crop",
+            visitedAt: new Date().toISOString(),
+          },
+          {
+            username: "carolSys",
+            avatarUrl:
+              "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=300&auto=format&fit=crop",
+            visitedAt: new Date().toISOString(),
+          },
+          {
+            username: "anaDevOps",
+            avatarUrl:
+              "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?q=80&w=300&auto=format&fit=crop",
+            visitedAt: new Date().toISOString(),
+          },
+        ],
       };
     }
     return BuildMockProfileData(username);
   }
   try {
-    const response = await apiClient.get<ProfileResponse>(`/profiles/${username}`);
+    const response = await apiClient.get<ProfileResponse>(`/profiles/${username}`, {
+      headers: accessToken
+        ? {
+            Authorization: `Bearer ${accessToken}`,
+          }
+        : undefined,
+    });
     return response.data;
   } catch {
-    return BuildMockProfileData(username);
+    throw new Error("fetch profile failed");
   }
 }
 
-export async function fetchProfilePosts(username: string) {
+export async function fetchProfilePreview(
+  username: string,
+): Promise<ProfilePreviewResponse | null> {
+  if (UseMockData) {
+    const feedUser = MockFeedData.find((postItem) => postItem.user.username === username)?.user;
+    if (!feedUser) {
+      return null;
+    }
+    return {
+      username,
+      name: feedUser.name ?? username,
+      bio: feedUser.bio ?? "Perfil de demonstracao para ambiente sem deploy.",
+      avatarUrl: feedUser.avatarUrl ?? null,
+    };
+  }
+  try {
+    const response = await apiClient.get<ProfileResponse>(`/profiles/${username}`);
+    return {
+      username: response.data.user.username,
+      name: response.data.name,
+      bio: response.data.bio,
+      avatarUrl: response.data.avatarUrl ?? null,
+    };
+  } catch {
+    return null;
+  }
+}
+
+export async function fetchProfileSearch(query: string): Promise<ProfileSearchItem[]> {
+  const safeQuery = query.trim().toLowerCase();
+  if (!safeQuery) {
+    return [];
+  }
+  if (UseMockData) {
+    const uniqueUsers = new Map<string, ProfileSearchItem>();
+    for (const postItem of MockFeedData) {
+      if (!uniqueUsers.has(postItem.user.username)) {
+        uniqueUsers.set(postItem.user.username, {
+          username: postItem.user.username,
+          name: postItem.user.name ?? postItem.user.username,
+          bio: postItem.user.bio ?? null,
+          avatarUrl: postItem.user.avatarUrl ?? null,
+        });
+      }
+    }
+    return [...uniqueUsers.values()]
+      .filter(
+        (userItem) =>
+          userItem.username.toLowerCase().includes(safeQuery) ||
+          userItem.name.toLowerCase().includes(safeQuery),
+      )
+      .slice(0, 8);
+  }
+  try {
+    const response = await apiClient.get<ProfileSearchItem[]>("/profiles/search", {
+      params: {
+        query: safeQuery,
+      },
+    });
+    return response.data;
+  } catch {
+    return [];
+  }
+}
+
+export async function fetchProfileSuggestions(limit = 8): Promise<ProfileSuggestionItem[]> {
+  const response = await fetch(`/api/profile-suggestions?limit=${encodeURIComponent(String(limit))}`, {
+    method: "GET",
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    return [];
+  }
+  return (await response.json()) as ProfileSuggestionItem[];
+}
+
+export async function fetchProfilePosts(username: string, accessToken?: string) {
   if (UseMockData) {
     const postsFromFeed = MockFeedData.filter(
       (postItem) => postItem.user.username === username,
@@ -239,10 +432,16 @@ export async function fetchProfilePosts(username: string) {
     return BuildMockProfilePostsData(username);
   }
   try {
-    const response = await apiClient.get(`/profiles/${username}/posts`);
+    const response = await apiClient.get(`/profiles/${username}/posts`, {
+      headers: accessToken
+        ? {
+            Authorization: `Bearer ${accessToken}`,
+          }
+        : undefined,
+    });
     return response.data;
   } catch {
-    return BuildMockProfilePostsData(username);
+    return [];
   }
 }
 
@@ -254,7 +453,7 @@ export async function fetchProfileAlbums(username: string) {
     const response = await apiClient.get(`/profiles/${username}/albums`);
     return response.data;
   } catch {
-    return BuildMockProfileAlbumsData(username);
+    return [];
   }
 }
 
@@ -297,12 +496,11 @@ export async function fetchProfileTestimonialsPage(
     );
     return response.data;
   } catch {
-    const mockItems = BuildMockTestimonialsData(username);
     return {
-      items: mockItems.slice(0, limit),
-      hasMore: mockItems.length > limit,
-      nextCursor: mockItems.length > limit ? String(limit) : null,
-      totalCount: mockItems.length,
+      items: [],
+      hasMore: false,
+      nextCursor: null,
+      totalCount: 0,
     };
   }
 }
@@ -317,6 +515,7 @@ export async function fetchPostById(
       id: mockPost.id,
       caption: mockPost.caption,
       createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
       user: {
         username: mockPost.user.username,
         profile: {
@@ -330,12 +529,26 @@ export async function fetchPostById(
         id: likeItem.id,
         user: {
           username: likeItem.id === "like_1" ? "maria" : likeItem.id === "like_2" ? "joao" : "carol",
+          profile: {
+            name: likeItem.id === "like_1" ? "Maria" : likeItem.id === "like_2" ? "Joao" : "Carol",
+            avatarUrl:
+              likeItem.id === "like_1"
+                ? "https://images.unsplash.com/photo-1544723795-3fb6469f5b39?q=80&w=300&auto=format&fit=crop"
+                : likeItem.id === "like_2"
+                  ? "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=300&auto=format&fit=crop"
+                  : "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=300&auto=format&fit=crop",
+            bio: "Curtiu essa publicacao",
+          },
         },
       })),
+      likesCount: mockPost.likes.length,
+      viewerHasLiked: false,
       comments: [
         {
           id: "mock_comment_1",
           content: "Muito bom esse post",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
           user: {
             username: "amigo1",
           },
@@ -343,6 +556,8 @@ export async function fetchPostById(
             {
               id: "mock_reply_1",
               content: "Concordo",
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
               user: {
                 username: "amigo2",
               },
@@ -395,6 +610,14 @@ export async function fetchNotifications(
           createdAt: new Date().toISOString(),
           actorUsername: "carolSys",
           message: "enviou um depoimento para voce",
+        },
+        {
+          id: "mock_notification_4",
+          type: "mention",
+          createdAt: new Date().toISOString(),
+          actorUsername: "anaDevOps",
+          message: "mencionou voce em uma publicacao",
+          targetId: "post_1",
         },
       ],
     };

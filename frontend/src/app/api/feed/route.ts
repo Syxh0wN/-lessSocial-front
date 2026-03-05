@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { buildMockFeedPage, fetchFeedPage } from "@/lib/api";
+import { fetchFeedPage } from "@/lib/api";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
@@ -11,7 +11,7 @@ export async function GET(request: Request) {
   const limit = Number.isNaN(rawLimit) ? 10 : rawLimit;
 
   if (!sessionUser?.accessToken) {
-    return NextResponse.json(buildMockFeedPage(cursor, limit));
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
   const feedPage = await fetchFeedPage(cursor, limit, sessionUser.accessToken);

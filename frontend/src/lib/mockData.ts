@@ -5,6 +5,7 @@ export type ProfileData = {
   userId: string;
   name: string;
   bio: string;
+  isPrivate: boolean;
   avatarUrl: string;
   instagramUrl?: string;
   facebookUrl?: string;
@@ -234,6 +235,7 @@ export function BuildMockProfileData(username: string): ProfileData {
     userId: `user_${username}`,
     name: username === BaseUsername ? "Leo" : "Usuario Demo",
     bio: "Perfil de demonstracao para ambiente sem deploy.",
+    isPrivate: false,
     avatarUrl:
       "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=800&auto=format&fit=crop",
     instagramUrl: "https://instagram.com/eusouleo",
@@ -268,7 +270,7 @@ export function BuildMockProfileAlbumsData(username: string): AlbumData[] {
   return [
     {
       id: `album_1_${username}`,
-      name: "AlbumPrincipal",
+      name: "Album Principal",
       items: [
         {
           id: `album_item_1_${username}`,

@@ -1,15 +1,25 @@
-import Link from "next/link";
 import { AuthButtons } from "@/components/authButtons";
 import { TopBar } from "@/components/topBar";
 import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 import { Camera, MessageSquare, UserRoundCheck } from "lucide-react";
 
 export default async function Home() {
   const session = await auth();
-  const username = (session?.user as { username?: string } | undefined)?.username;
+  const sessionUser = session?.user as { username?: string; needsOnboarding?: boolean } | undefined;
+  const username = sessionUser?.username;
+  const needsOnboarding = Boolean(sessionUser?.needsOnboarding);
+
+  if (session && username) {
+    if (needsOnboarding) {
+      redirect("/onboarding");
+    }
+    redirect(`/${username}`);
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <TopBar username={username} />
+      <TopBar username={username} hideHomeActions={Boolean(session)} />
       <main className="mx-auto flex max-w-5xl flex-col gap-8 px-6 py-10">
         <section className="rounded-2xl border border-borderColor bg-surface p-6 md:p-8">
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
@@ -27,12 +37,6 @@ export default async function Home() {
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <AuthButtons isAuthenticated={Boolean(session)} />
-                <Link
-                  href="/feed"
-                  className="rounded-md border border-borderColor bg-background px-4 py-2 text-sm font-medium text-foreground transition hover:border-primary"
-                >
-                  Explorar feed
-                </Link>
               </div>
             </div>
             <div className="rounded-xl border border-borderColor bg-background p-5">

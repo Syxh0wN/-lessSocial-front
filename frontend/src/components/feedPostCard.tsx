@@ -1,6 +1,9 @@
 "use client";
 
 import type { FeedPost } from "@/lib/api";
+import { MentionAutocompleteInput } from "@/components/mentionAutocompleteInput";
+import { MentionText } from "@/components/mentionText";
+import { SocialHandleToUrl } from "@/lib/socialHandles";
 import {
   Facebook,
   Heart,
@@ -11,39 +14,142 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import type { MouseEvent } from "react";
+import { type FormEvent, type MouseEvent, useState } from "react";
 
 type FeedPostCardProps = {
   post: FeedPost;
+  allowInteractions?: boolean;
 };
 
-export function FeedPostCard({ post }: FeedPostCardProps) {
+type FeedCardComment = {
+  id: string;
+  content: string;
+  user: {
+    username: string;
+  };
+};
+
+export function FeedPostCard({ post, allowInteractions = true }: FeedPostCardProps) {
   const router = useRouter();
-  const stopCardNavigation = (event: MouseEvent<HTMLAnchorElement>) => {
+  const [likesCount, setLikesCount] = useState(post.likes.length);
+  const [commentsCount, setCommentsCount] = useState(post.comments.length);
+  const [isLiked, setIsLiked] = useState(false);
+  const [isLikePending, setIsLikePending] = useState(false);
+  const [showCommentForm, setShowCommentForm] = useState(false);
+  const [commentText, setCommentText] = useState("");
+  const [isCommentPending, setIsCommentPending] = useState(false);
+  const [commentsList, setCommentsList] = useState<FeedCardComment[]>([]);
+  const [isCommentsLoading, setIsCommentsLoading] = useState(false);
+  const stopCardNavigation = (event: MouseEvent<HTMLElement>) => {
     event.stopPropagation();
+  };
+  const handleToggleLike = async (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    if (isLikePending) {
+      return;
+    }
+    setIsLikePending(true);
+    try {
+      const response = await fetch(`/api/posts/${post.id}/likes`, {
+        method: isLiked ? "DELETE" : "POST",
+      });
+      if (!response.ok) {
+        return;
+      }
+      setIsLiked((currentValue) => !currentValue);
+      setLikesCount((currentCount) => {
+        if (isLiked) {
+          return Math.max(currentCount - 1, 0);
+        }
+        return currentCount + 1;
+      });
+    } finally {
+      setIsLikePending(false);
+    }
+  };
+  const handleCommentSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (isCommentPending) {
+      return;
+    }
+    const safeContent = commentText.trim();
+    if (!safeContent) {
+      return;
+    }
+    setIsCommentPending(true);
+    try {
+      const response = await fetch(`/api/posts/${post.id}/comments`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          content: safeContent,
+        }),
+      });
+      if (!response.ok) {
+        return;
+      }
+      setCommentText("");
+      setCommentsCount((currentCount) => currentCount + 1);
+      setCommentsList((currentItems) => [
+        ...currentItems,
+        {
+          id: `local_${Date.now()}`,
+          content: safeContent,
+          user: {
+            username: "voce",
+          },
+        },
+      ]);
+    } finally {
+      setIsCommentPending(false);
+    }
+  };
+  const loadCommentsList = async () => {
+    if (isCommentsLoading) {
+      return;
+    }
+    setIsCommentsLoading(true);
+    try {
+      const response = await fetch(`/api/posts/${post.id}`, {
+        method: "GET",
+        cache: "no-store",
+      });
+      if (!response.ok) {
+        return;
+      }
+      const payload = (await response.json()) as {
+        comments?: FeedCardComment[];
+      };
+      setCommentsList(payload.comments ?? []);
+    } finally {
+      setIsCommentsLoading(false);
+    }
   };
   const previewSocialLinks = [
     {
       key: "instagram",
-      href: post.user.profile?.instagramUrl,
+      href: SocialHandleToUrl("instagram", post.user.profile?.instagramUrl),
       label: "Instagram",
       icon: <Instagram size={14} />,
     },
     {
       key: "facebook",
-      href: post.user.profile?.facebookUrl,
+      href: SocialHandleToUrl("facebook", post.user.profile?.facebookUrl),
       label: "Facebook",
       icon: <Facebook size={14} />,
     },
     {
       key: "youtube",
-      href: post.user.profile?.youtubeUrl,
+      href: SocialHandleToUrl("youtube", post.user.profile?.youtubeUrl),
       label: "Youtube",
       icon: <Youtube size={14} />,
     },
     {
       key: "x",
-      href: post.user.profile?.xUrl,
+      href: SocialHandleToUrl("x", post.user.profile?.xUrl),
       label: "X",
       icon: (
         <span className="inline-flex h-4 w-4 items-center justify-center text-[10px] font-bold">
@@ -53,13 +159,13 @@ export function FeedPostCard({ post }: FeedPostCardProps) {
     },
     {
       key: "twitch",
-      href: post.user.profile?.twitchUrl,
+      href: SocialHandleToUrl("twitch", post.user.profile?.twitchUrl),
       label: "Twitch",
       icon: <Twitch size={14} />,
     },
     {
       key: "kick",
-      href: post.user.profile?.kickUrl,
+      href: SocialHandleToUrl("kick", post.user.profile?.kickUrl),
       label: "Kick",
       icon: (
         <span className="inline-flex h-4 w-4 items-center justify-center text-[10px] font-bold">
@@ -87,7 +193,7 @@ export function FeedPostCard({ post }: FeedPostCardProps) {
                   post.user.profile?.avatarUrl ??
                   "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=300&auto=format&fit=crop"
                 }
-                alt={`Avatar${post.user.username}`}
+                alt={`Avatar de ${post.user.username}`}
                 className="h-10 w-10 rounded-full border border-borderColor object-cover"
               />
             </Link>
@@ -107,7 +213,7 @@ export function FeedPostCard({ post }: FeedPostCardProps) {
                   post.user.profile?.avatarUrl ??
                   "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=300&auto=format&fit=crop"
                 }
-                alt={`Preview${post.user.username}`}
+                alt={`Preview de ${post.user.username}`}
                 className="h-12 w-12 rounded-full border border-borderColor object-cover"
               />
               <div className="min-w-0">
@@ -143,12 +249,14 @@ export function FeedPostCard({ post }: FeedPostCardProps) {
           </div>
         </div>
       </div>
-      <p className="mt-2 text-base">{post.caption ?? "PostSemLegenda"}</p>
+      <p className="mt-2 text-base">
+        <MentionText text={post.caption ?? "Post sem legenda"} />
+      </p>
       <div className="mt-4 grid grid-cols-1 gap-3">
         {post.media.map((mediaItem) => (
           <div key={mediaItem.id} className="overflow-hidden rounded-md border border-borderColor">
             {mediaItem.type === "image" ? (
-              <img src={mediaItem.url} alt="PostMedia" className="h-auto w-full object-cover" />
+              <img src={mediaItem.url} alt="Midia do post" className="h-auto w-full object-cover" />
             ) : (
               <video controls className="w-full" onClick={(event) => event.stopPropagation()}>
                 <source src={mediaItem.url} />
@@ -158,15 +266,83 @@ export function FeedPostCard({ post }: FeedPostCardProps) {
         ))}
       </div>
       <div className="mt-4 flex gap-6 text-sm text-muted">
-        <span className="inline-flex cursor-pointer items-center gap-2 transition hover:text-primary">
-          <Heart size={16} />
-          {post.likes.length} Curtidas
-        </span>
-        <span className="inline-flex cursor-pointer items-center gap-2 transition hover:text-primary">
-          <MessageCircle size={16} />
-          {post.comments.length} Comentarios
-        </span>
+        {allowInteractions ? (
+          <>
+            <button
+              type="button"
+              onClick={handleToggleLike}
+              className={`inline-flex items-center gap-2 transition hover:text-primary ${
+                isLiked ? "text-primary" : ""
+              }`}
+            >
+              <Heart size={16} className={isLiked ? "fill-primary text-primary" : ""} />
+              {likesCount} Curtidas
+            </button>
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                const nextValue = !showCommentForm;
+                setShowCommentForm(nextValue);
+                if (nextValue) {
+                  void loadCommentsList();
+                }
+              }}
+              className="inline-flex items-center gap-2 transition hover:text-primary"
+            >
+              <MessageCircle size={16} />
+              {commentsCount} Comentarios
+            </button>
+          </>
+        ) : (
+          <>
+            <span className="inline-flex items-center gap-2">
+              <Heart size={16} />
+              {likesCount} Curtidas
+            </span>
+            <span className="inline-flex items-center gap-2">
+              <MessageCircle size={16} />
+              {commentsCount} Comentarios
+            </span>
+          </>
+        )}
       </div>
+      {allowInteractions && showCommentForm ? (
+        <form
+          onSubmit={handleCommentSubmit}
+          className="mt-3 flex w-full flex-col gap-2"
+          onClick={stopCardNavigation}
+        >
+          <MentionAutocompleteInput
+            value={commentText}
+            onChange={setCommentText}
+            placeholder="Escreva um comentario"
+            className="w-full rounded-md border border-borderColor bg-background px-4 py-3 text-base text-foreground outline-none focus:outline-none focus:ring-0"
+            maxLength={500}
+          />
+          <button
+            type="submit"
+            className="self-end rounded-md border border-borderColor bg-background px-4 py-2 text-xs font-medium text-foreground transition hover:bg-primarySoft"
+          >
+            Enviar
+          </button>
+        </form>
+      ) : null}
+      {allowInteractions && showCommentForm ? (
+        <div className="mt-3 space-y-2 border-t border-borderColor pt-3">
+          {isCommentsLoading ? (
+            <p className="text-xs text-muted">Carregando comentarios...</p>
+          ) : commentsList.length === 0 ? (
+            <p className="text-xs text-muted">Sem comentarios ainda.</p>
+          ) : (
+            commentsList.map((commentItem) => (
+              <p key={commentItem.id} className="text-sm text-muted">
+                <b className="text-foreground">@{commentItem.user.username}</b> {commentItem.content}
+              </p>
+            ))
+          )}
+        </div>
+      ) : null}
     </article>
   );
 }

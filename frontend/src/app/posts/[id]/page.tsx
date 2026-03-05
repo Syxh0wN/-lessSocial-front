@@ -1,7 +1,10 @@
 import { auth } from "@/auth";
+import { MentionText } from "@/components/mentionText";
+import { PostDetailsInteractions } from "@/components/postDetailsInteractions";
 import { fetchPostById } from "@/lib/api";
-import { Heart, MessageCircle, X } from "lucide-react";
+import { X } from "lucide-react";
 import Link from "next/link";
+import { UpdateCommentAction, UpdatePostCaptionAction } from "./actions";
 
 type PostDetailsPageProps = {
   params: Promise<{ id: string }>;
@@ -13,15 +16,16 @@ export default async function PostDetailsPage({ params }: PostDetailsPageProps) 
   const sessionUser = session?.user as
     | { username?: string; accessToken?: string }
     | undefined;
+  const sessionUsername = sessionUser?.username;
   const post = await fetchPostById(id, sessionUser?.accessToken);
 
   if (!post) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
         <div className="rounded-xl border border-borderColor bg-surface p-6">
-          <p>PostNaoEncontrado</p>
+          <p>Post nao encontrado</p>
           <Link href="/feed" className="mt-4 inline-block text-primary underline">
-            VoltarParaFeed
+            Voltar para o feed
           </Link>
         </div>
       </div>
@@ -34,8 +38,17 @@ export default async function PostDetailsPage({ params }: PostDetailsPageProps) 
     month: "2-digit",
     year: "numeric",
   });
-  const visibleLikes = post.likes.slice(0, 3);
-  const hiddenLikesCount = Math.max(post.likes.length - visibleLikes.length, 0);
+  const postIsEdited = new Date(post.updatedAt).getTime() > new Date(post.createdAt).getTime();
+  const likesUsersPreview = post.likes.map((likeItem) => ({
+    username: likeItem.user.username,
+    name: likeItem.user.profile?.name,
+    avatarUrl: likeItem.user.profile?.avatarUrl,
+    bio: likeItem.user.profile?.bio,
+  }));
+  const canEditPost = sessionUsername === post.user.username;
+  const initiallyLiked = Boolean(
+    sessionUsername && post.likes.some((likeItem) => likeItem.user.username === sessionUsername),
+  );
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-background text-foreground">
@@ -59,7 +72,7 @@ export default async function PostDetailsPage({ params }: PostDetailsPageProps) 
                   post.user.profile?.avatarUrl ??
                   "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=300&auto=format&fit=crop"
                 }
-                alt={`Avatar${post.user.username}`}
+                alt={`Avatar de ${post.user.username}`}
                 className="h-10 w-10 rounded-full border border-borderColor object-cover"
               />
               <div>
@@ -82,7 +95,7 @@ export default async function PostDetailsPage({ params }: PostDetailsPageProps) 
               {firstMedia?.type === "image" ? (
                 <img
                   src={firstMedia.url}
-                  alt="PostPrincipal"
+                  alt="Post principal"
                   className="h-full max-h-[70vh] w-full object-contain"
                 />
               ) : (
@@ -94,45 +107,45 @@ export default async function PostDetailsPage({ params }: PostDetailsPageProps) 
 
             <section className="flex max-h-[45vh] flex-col">
               <div className="border-b border-borderColor px-5 py-4">
-                <p className="text-sm text-muted">{post.caption ?? "PostSemLegenda"}</p>
-                <div className="mt-3 flex gap-6 text-sm text-muted">
-                  <span className="inline-flex items-center gap-2">
-                    <Heart size={16} />
-                    {post.likes.length} Curtidas
-                  </span>
-                  <span className="inline-flex items-center gap-2">
-                    <MessageCircle size={16} />
-                    {post.comments.length} Comentarios
-                  </span>
-                </div>
-              </div>
-
-              <div className="border-b border-borderColor px-5 py-4">
-                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">
-                  QuemCurtiu
-                </p>
-                {post.likes.length === 0 ? (
-                  <p className="text-sm text-muted">Nenhuma curtida ainda.</p>
-                ) : (
-                  <div className="flex flex-wrap gap-2">
-                    {visibleLikes.map((likeItem) => (
-                      <span
-                        key={likeItem.id}
-                        className="rounded-full border border-borderColor bg-background px-3 py-1 text-xs text-foreground"
+                {canEditPost ? (
+                  <form action={UpdatePostCaptionAction} className="space-y-2">
+                    <input type="hidden" name="postId" value={post.id} />
+                    <textarea
+                      name="caption"
+                      defaultValue={post.caption ?? ""}
+                      maxLength={500}
+                      rows={2}
+                      className="w-full rounded-md border border-borderColor bg-background px-3 py-2 text-sm text-muted"
+                    />
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="submit"
+                        className="rounded-md border border-borderColor bg-background px-3 py-1 text-xs font-medium text-foreground transition hover:bg-primarySoft"
                       >
-                        @{likeItem.user.username}
-                      </span>
-                    ))}
-                    {hiddenLikesCount > 0 ? (
-                      <span className="rounded-full border border-borderColor bg-background px-3 py-1 text-xs text-muted">
-                        +{hiddenLikesCount} outrasCurtidas
-                      </span>
-                    ) : null}
-                  </div>
+                        Salvar descricao
+                      </button>
+                      {postIsEdited ? (
+                        <span className="text-[11px] text-muted">(editado)</span>
+                      ) : null}
+                    </div>
+                  </form>
+                ) : (
+                  <p className="text-sm text-muted">
+                    <MentionText text={post.caption ?? "Post sem legenda"} />{" "}
+                    {postIsEdited ? <span className="text-[11px]">(editado)</span> : null}
+                  </p>
                 )}
               </div>
 
               <div className="flex-1 overflow-y-auto px-5 py-4">
+                <PostDetailsInteractions
+                  postId={post.id}
+                  initialCommentsCount={post.comments.length}
+                  initiallyLiked={initiallyLiked}
+                  allowInteractions={Boolean(sessionUser?.accessToken)}
+                  likesUsersPreview={likesUsersPreview}
+                  totalLikesCount={post.likesCount}
+                />
                 <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted">
                   Comentarios
                 </p>
@@ -141,15 +154,83 @@ export default async function PostDetailsPage({ params }: PostDetailsPageProps) 
                 ) : (
                   post.comments.map((commentItem) => (
                     <div key={commentItem.id} className="mb-4">
-                      <p className="text-sm">
-                        <span className="font-semibold">@{commentItem.user.username}</span>{" "}
-                        {commentItem.content}
-                      </p>
-                      {commentItem.replies.map((replyItem) => (
-                        <p key={replyItem.id} className="ml-4 mt-1 text-xs text-muted">
-                          <span className="font-semibold">@{replyItem.user.username}</span>{" "}
-                          {replyItem.content}
+                      {sessionUsername === commentItem.user.username ? (
+                        <form action={UpdateCommentAction} className="space-y-2">
+                          <input type="hidden" name="postId" value={post.id} />
+                          <input type="hidden" name="commentId" value={commentItem.id} />
+                          <p className="text-sm">
+                            <span className="font-semibold">@{commentItem.user.username}</span>
+                          </p>
+                          <textarea
+                            name="content"
+                            defaultValue={commentItem.content}
+                            maxLength={500}
+                            rows={2}
+                            className="w-full rounded-md border border-borderColor bg-background px-3 py-2 text-sm text-muted"
+                          />
+                          <div className="flex items-center gap-3">
+                            <button
+                              type="submit"
+                              className="rounded-md border border-borderColor bg-background px-3 py-1 text-xs font-medium text-foreground transition hover:bg-primarySoft"
+                            >
+                              Salvar comentario
+                            </button>
+                            {new Date(commentItem.updatedAt).getTime() >
+                            new Date(commentItem.createdAt).getTime() ? (
+                              <span className="text-[11px] text-muted">(editado)</span>
+                            ) : null}
+                          </div>
+                        </form>
+                      ) : (
+                        <p className="text-sm">
+                          <span className="font-semibold">@{commentItem.user.username}</span>{" "}
+                          <MentionText text={commentItem.content} />{" "}
+                          {new Date(commentItem.updatedAt).getTime() >
+                          new Date(commentItem.createdAt).getTime() ? (
+                            <span className="text-[11px] text-muted">(editado)</span>
+                          ) : null}
                         </p>
+                      )}
+                      {commentItem.replies.map((replyItem) => (
+                        <div key={replyItem.id} className="ml-4 mt-2">
+                          {sessionUsername === replyItem.user.username ? (
+                            <form action={UpdateCommentAction} className="space-y-2">
+                              <input type="hidden" name="postId" value={post.id} />
+                              <input type="hidden" name="commentId" value={replyItem.id} />
+                              <p className="text-xs text-muted">
+                                <span className="font-semibold">@{replyItem.user.username}</span>
+                              </p>
+                              <textarea
+                                name="content"
+                                defaultValue={replyItem.content}
+                                maxLength={500}
+                                rows={2}
+                                className="w-full rounded-md border border-borderColor bg-background px-3 py-2 text-xs text-muted"
+                              />
+                              <div className="flex items-center gap-3">
+                                <button
+                                  type="submit"
+                                  className="rounded-md border border-borderColor bg-background px-3 py-1 text-[11px] font-medium text-foreground transition hover:bg-primarySoft"
+                                >
+                                  Salvar resposta
+                                </button>
+                                {new Date(replyItem.updatedAt).getTime() >
+                                new Date(replyItem.createdAt).getTime() ? (
+                                  <span className="text-[11px] text-muted">(editado)</span>
+                                ) : null}
+                              </div>
+                            </form>
+                          ) : (
+                            <p className="text-xs text-muted">
+                              <span className="font-semibold">@{replyItem.user.username}</span>{" "}
+                              <MentionText text={replyItem.content} />{" "}
+                              {new Date(replyItem.updatedAt).getTime() >
+                              new Date(replyItem.createdAt).getTime() ? (
+                                <span className="text-[11px] text-muted">(editado)</span>
+                              ) : null}
+                            </p>
+                          )}
+                        </div>
                       ))}
                     </div>
                   ))

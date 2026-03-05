@@ -1,6 +1,7 @@
 "use client";
 
 import type { NotificationItem, NotificationsResponse } from "@/lib/api";
+import { MentionText } from "@/components/mentionText";
 import { Bell } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -76,9 +77,9 @@ export function NotificationsBell() {
           </div>
           <div className="max-h-96 overflow-y-auto">
             {isLoading ? (
-              <p className="px-4 py-3 text-xs text-muted">CarregandoNotificacoes</p>
+              <p className="px-4 py-3 text-xs text-muted">Carregando notificacoes</p>
             ) : !hasNotifications ? (
-              <p className="px-4 py-3 text-xs text-muted">SemNotificacoesNoMomento</p>
+              <p className="px-4 py-3 text-xs text-muted">Sem notificacoes no momento</p>
             ) : (
               notifications.map((notificationItem) => (
                 <div
@@ -86,7 +87,8 @@ export function NotificationsBell() {
                   className="border-b border-borderColor px-4 py-3 text-xs"
                 >
                   <p className="text-foreground">
-                    <b>@{notificationItem.actorUsername}</b> {notificationItem.message}
+                    <MentionText text={`@${notificationItem.actorUsername}`} />{" "}
+                    {notificationItem.message}
                   </p>
                   <p className="mt-1 text-muted">
                     {formatNotificationDate(notificationItem.createdAt)}
@@ -97,7 +99,7 @@ export function NotificationsBell() {
                       className="mt-2 inline-block text-[11px] text-primary hover:underline"
                       onClick={() => setIsOpen(false)}
                     >
-                      VerInteracao
+                      Ver interacao
                     </Link>
                   ) : null}
                 </div>
