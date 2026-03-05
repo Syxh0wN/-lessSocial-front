@@ -156,27 +156,29 @@ export default async function ProfilePage({
                 <UserRound size={22} />
                 {profile?.name ?? username}
               </h1>
-              <p className="text-sm text-muted">@{username}</p>
+              <div className="mt-1 flex flex-wrap items-center justify-between gap-3">
+                <p className="text-sm text-muted">@{username}</p>
+                {socialLinks.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {socialLinks.map((socialItem) => (
+                      <a
+                        key={socialItem.key}
+                        href={socialItem.href}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-borderColor bg-background text-muted transition hover:border-primary hover:text-primary"
+                        aria-label={socialItem.label}
+                        title={socialItem.label}
+                      >
+                        {socialItem.icon}
+                      </a>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
               <p className="mt-3 max-w-3xl text-sm">
                 {profile?.bio ?? "Perfil em construcao para o portfolio LessSocial."}
               </p>
-              {socialLinks.length > 0 ? (
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {socialLinks.map((socialItem) => (
-                    <a
-                      key={socialItem.key}
-                      href={socialItem.href}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-borderColor bg-background text-muted transition hover:border-primary hover:text-primary"
-                      aria-label={socialItem.label}
-                      title={socialItem.label}
-                    >
-                      {socialItem.icon}
-                    </a>
-                  ))}
-                </div>
-              ) : null}
               <div className="mt-4 flex flex-wrap gap-5 text-sm text-muted">
                 <Link
                   href={`/${username}`}
