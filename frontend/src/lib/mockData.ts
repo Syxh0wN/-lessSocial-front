@@ -65,6 +65,12 @@ export const MockFeedData: FeedPost[] = [
       bio: "Criador do LessSocial",
       avatarUrl:
         "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=300&auto=format&fit=crop",
+      profile: {
+        instagramUrl: "https://instagram.com/eusouleo",
+        youtubeUrl: "https://youtube.com/@eusouleo",
+        xUrl: "https://x.com/eusouleo",
+        twitchUrl: "https://twitch.tv/eusouleo",
+      },
     },
     media: [
       {
@@ -85,6 +91,10 @@ export const MockFeedData: FeedPost[] = [
       bio: "Perfil de teste para preview no feed",
       avatarUrl:
         "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=300&auto=format&fit=crop",
+      profile: {
+        instagramUrl: "https://instagram.com/devuser",
+        facebookUrl: "https://facebook.com/devuser",
+      },
     },
     media: [
       {

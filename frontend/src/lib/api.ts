@@ -25,6 +25,12 @@ export type FeedPost = {
       name?: string;
       bio?: string;
       avatarUrl?: string;
+      instagramUrl?: string;
+      facebookUrl?: string;
+      youtubeUrl?: string;
+      xUrl?: string;
+      twitchUrl?: string;
+      kickUrl?: string;
     };
   };
   media: Array<{
