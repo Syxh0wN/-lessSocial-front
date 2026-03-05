@@ -23,7 +23,7 @@ export default async function Home() {
               </h1>
               <p className="mt-4 max-w-xl text-sm text-muted md:text-base">
                 Rede social focada em criacao de perfil publico, posts com imagem ou video,
-                amizade, comentarios, curtidas e depoimentos estilo orkut.
+                amizade, comentarios, curtidas e depoimentos.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <AuthButtons isAuthenticated={Boolean(session)} />
