@@ -1,6 +1,12 @@
 import { TopBar } from "@/components/topBar";
 import { auth } from "@/auth";
-import { fetchProfile, fetchProfileAlbums, fetchProfilePosts } from "@/lib/api";
+import { FeedPostCard } from "@/components/feedPostCard";
+import {
+  fetchProfile,
+  fetchProfileAlbums,
+  fetchProfilePosts,
+  type FeedPost,
+} from "@/lib/api";
 import { Album, FileImage, ImageIcon, Pencil, UserPlus, UserRound } from "lucide-react";
 
 type ProfilePageProps = {
@@ -26,6 +32,27 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   const coverImage =
     "https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=1400&auto=format&fit=crop";
   const isOwnProfile = currentUsername === username;
+  const profileFeedPosts: FeedPost[] = posts.map(
+    (postItem: {
+      id: string;
+      caption?: string | null;
+      media?: { id: string; type: "image" | "video"; url: string }[];
+      likes?: { id: string }[];
+      comments?: { id: string }[];
+    }) => ({
+      id: postItem.id,
+      caption: postItem.caption ?? null,
+      user: {
+        username,
+        name: profile?.name ?? username,
+        bio: profile?.bio ?? undefined,
+        avatarUrl: profile?.avatarUrl ?? undefined,
+      },
+      media: postItem.media ?? [],
+      likes: postItem.likes ?? [],
+      comments: postItem.comments ?? [],
+    }),
+  );
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -88,38 +115,10 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
           {posts.length === 0 ? (
             <p className="text-sm text-muted">Nenhum post publicado ainda.</p>
           ) : (
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {posts.slice(0, 4).map((postItem: { id: string; caption?: string; media?: { id: string; type: "image" | "video"; url: string }[] }) => {
-                const firstMedia = postItem.media?.[0];
-                return (
-                  <a
-                    key={postItem.id}
-                    href={`/posts/${postItem.id}`}
-                    className="group overflow-hidden rounded-xl border border-borderColor bg-background transition hover:border-primary"
-                  >
-                    {firstMedia ? (
-                      firstMedia.type === "image" ? (
-                        <img
-                          src={firstMedia.url}
-                          alt={`Post${postItem.id}`}
-                          className="h-40 w-full object-cover transition group-hover:scale-[1.01]"
-                        />
-                      ) : (
-                        <video className="h-40 w-full object-cover" muted>
-                          <source src={firstMedia.url} />
-                        </video>
-                      )
-                    ) : (
-                      <div className="flex h-40 items-center justify-center text-sm text-muted">
-                        SemMidia
-                      </div>
-                    )}
-                    <div className="p-3 text-sm text-muted">
-                      {postItem.caption ?? "PostSemLegenda"}
-                    </div>
-                  </a>
-                );
-              })}
+            <div className="flex flex-col gap-4">
+              {profileFeedPosts.map((postItem) => (
+                <FeedPostCard key={postItem.id} post={postItem} />
+              ))}
             </div>
           )}
         </section>
