@@ -176,24 +176,17 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-borderColor bg-surface p-5">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="inline-flex items-center gap-2 text-lg font-semibold">
-              <FileImage size={18} />
-              PostsRecentes
-            </h2>
-            <span className="text-sm text-muted">{postCount} itens</span>
+        {posts.length === 0 ? (
+          <div className="rounded-2xl border border-borderColor bg-surface p-5 text-sm text-muted">
+            Nenhum post publicado ainda.
           </div>
-          {posts.length === 0 ? (
-            <p className="text-sm text-muted">Nenhum post publicado ainda.</p>
-          ) : (
-            <div className="flex flex-col gap-4">
-              {profileFeedPosts.map((postItem) => (
-                <FeedPostCard key={postItem.id} post={postItem} />
-              ))}
-            </div>
-          )}
-        </section>
+        ) : (
+          <div className="flex flex-col gap-4">
+            {profileFeedPosts.map((postItem) => (
+              <FeedPostCard key={postItem.id} post={postItem} />
+            ))}
+          </div>
+        )}
 
       </main>
     </div>
