@@ -4,7 +4,6 @@ import { FeedPostCard } from "@/components/feedPostCard";
 import { ProfileTestimonialsTimeline } from "@/components/profileTestimonialsTimeline";
 import {
   fetchProfile,
-  fetchProfileAlbums,
   fetchProfilePosts,
   fetchProfileTestimonialsPage,
   type FeedPost,
@@ -38,7 +37,6 @@ export default async function ProfilePage({
   const currentUsername = (session?.user as { username?: string } | undefined)?.username;
   const profile = await fetchProfile(username).catch(() => null);
   const posts = await fetchProfilePosts(username).catch(() => []);
-  const albums = await fetchProfileAlbums(username).catch(() => []);
   const testimonialsPage = await fetchProfileTestimonialsPage(
     username,
     undefined,
@@ -51,7 +49,6 @@ export default async function ProfilePage({
   }));
   const testimonials = testimonialsPage.items;
   const postCount = posts.length;
-  const albumCount = albums.length;
   const testimonialCount = testimonialsPage.totalCount;
   const mediaCount = posts.reduce(
     (total: number, postItem: { media?: unknown[] }) => total + (postItem.media?.length ?? 0),
@@ -180,9 +177,6 @@ export default async function ProfilePage({
                   ))}
                 </div>
               ) : null}
-              <p className="mt-2 text-xs text-muted">
-                Albuns: <b className="text-foreground">{albumCount}</b>
-              </p>
               <div className="mt-4 flex flex-wrap gap-5 text-sm text-muted">
                 <Link
                   href={`/${username}`}
