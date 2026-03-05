@@ -69,22 +69,22 @@ export default async function PostDetailsPage({ params }: PostDetailsPageProps) 
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2">
+          <div className="grid grid-cols-1">
             <section className="bg-black/10">
               {firstMedia?.type === "image" ? (
                 <img
                   src={firstMedia.url}
                   alt="PostPrincipal"
-                  className="h-full max-h-[75vh] w-full object-contain"
+                  className="h-full max-h-[70vh] w-full object-contain"
                 />
               ) : (
-                <video controls className="h-full max-h-[75vh] w-full object-contain">
+                <video controls className="h-full max-h-[70vh] w-full object-contain">
                   <source src={firstMedia?.url} />
                 </video>
               )}
             </section>
 
-            <section className="flex max-h-[75vh] flex-col">
+            <section className="flex max-h-[45vh] flex-col">
               <div className="border-b border-borderColor px-5 py-4">
                 <p className="text-sm text-muted">{post.caption ?? "PostSemLegenda"}</p>
                 <div className="mt-3 flex gap-6 text-sm text-muted">
