@@ -17,10 +17,9 @@ export default async function Home() {
               <p className="inline-flex rounded-full border border-borderColor bg-background px-3 py-1 text-xs text-muted">
                 PlataformaParaPortfolio
               </p>
-              <h1 className="mt-4 text-3xl font-semibold leading-tight text-primaryActive md:text-4xl">
-                ConstruaSeuPerfil
-                <br />
-                EMostreSeuTrabalho
+              <h1 className="mt-4 text-3xl font-semibold leading-snug text-primaryActive md:text-4xl md:leading-[1.2]">
+                <span className="block">ConstruaSeuPerfil</span>
+                <span className="mt-2 block">EMostreSeuTrabalho</span>
               </h1>
               <p className="mt-4 max-w-xl text-sm text-muted md:text-base">
                 Rede social focada em criacao de perfil publico, posts com imagem ou video,
