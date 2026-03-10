@@ -1,19 +1,19 @@
 # lessSocial Backend
 
-API do lessSocial feita com NestJS, Prisma e MySQL.
+API do lessSocial feita com NestJS, Prisma e PostgreSQL.
 
 ## Stack
 
 - NestJS
 - Prisma ORM
-- MySQL
+- PostgreSQL
 - JWT AccessToken + RefreshToken
 
 ## Requisitos
 
 - Node.js 20+
 - npm 10+
-- MySQL 8+
+- PostgreSQL 15+
 
 ## Variaveis de Ambiente
 
@@ -158,3 +158,26 @@ npm run test --workspace backend
 2. Rode migracoes em producao
 3. Suba aplicacao com `npm run start:prod --workspace backend`
 4. Valide `GET /api/health`
+
+## Deploy na AWS App Runner com Docker
+
+1. No App Runner, crie um servico a partir do repositorio GitHub
+2. Configure `Dockerfile path` como `backend/Dockerfile`
+3. Configure `Port` como `3000`
+4. Defina as variaveis:
+   - `NODE_ENV=production`
+   - `PORT=3000`
+   - `DATABASE_URL=postgresql://...`
+   - `JWT_ACCESS_SECRET=...`
+   - `JWT_REFRESH_SECRET=...`
+   - `FRONTEND_URL=https://SEU_FRONTEND.vercel.app`
+   - `LOG_LEVEL=info`
+5. Apos o primeiro deploy, rode migracoes:
+
+```bash
+npx prisma migrate deploy --schema backend/prisma/schema.prisma
+```
+
+6. Valide:
+   - `GET https://SEU_BACKEND_AWS/api/health`
+   - CORS respondendo para o dominio do Vercel

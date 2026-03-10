@@ -7,6 +7,11 @@ import pinoHttp from 'pino-http';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const frontendOrigins =
+    process.env.FRONTEND_URL
+      ?.split(',')
+      .map((origin) => origin.trim())
+      .filter((origin) => origin.length > 0) ?? ['http://localhost:3001'];
   app.use(helmet());
   app.use(
     pinoHttp({
@@ -14,7 +19,7 @@ async function bootstrap() {
     }),
   );
   app.enableCors({
-    origin: process.env.FRONTEND_URL?.split(',') ?? ['http://localhost:3001'],
+    origin: frontendOrigins,
     credentials: true,
   });
   app.useGlobalPipes(

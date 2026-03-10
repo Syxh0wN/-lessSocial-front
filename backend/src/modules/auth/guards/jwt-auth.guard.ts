@@ -5,6 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { getJwtAccessSecret } from '../../../config/env';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -28,7 +29,7 @@ export class JwtAuthGuard implements CanActivate {
         email: string;
         username: string;
       }>(token, {
-        secret: process.env.JWT_ACCESS_SECRET ?? 'devAccessSecret',
+        secret: getJwtAccessSecret(),
       });
       request.user = payload;
       return true;

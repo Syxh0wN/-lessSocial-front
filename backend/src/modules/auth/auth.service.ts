@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuthGoogleDto } from './dto/auth-google.dto';
+import { getJwtAccessSecret, getJwtRefreshSecret } from '../../config/env';
 
 @Injectable()
 export class AuthService {
@@ -55,7 +56,7 @@ export class AuthService {
         email: string;
         username: string;
       }>(refreshToken, {
-        secret: process.env.JWT_REFRESH_SECRET ?? 'devRefreshSecret',
+        secret: getJwtRefreshSecret(),
       });
       return this.buildTokens(payload.sub, payload.email, payload.username);
     } catch {
@@ -71,14 +72,14 @@ export class AuthService {
     const accessToken = await this.jwtService.signAsync(
       { sub: userId, email, username },
       {
-        secret: process.env.JWT_ACCESS_SECRET ?? 'devAccessSecret',
+        secret: getJwtAccessSecret(),
         expiresIn: '15m',
       },
     );
     const refreshToken = await this.jwtService.signAsync(
       { sub: userId, email, username },
       {
-        secret: process.env.JWT_REFRESH_SECRET ?? 'devRefreshSecret',
+        secret: getJwtRefreshSecret(),
         expiresIn: '7d',
       },
     );

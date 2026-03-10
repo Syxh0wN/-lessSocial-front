@@ -17,6 +17,7 @@ import { UpdateCommentDto } from '../comments/dto/update-comment.dto';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostCaptionDto } from './dto/update-post-caption.dto';
 import { PostsService } from './posts.service';
+import { getJwtAccessSecret } from '../../config/env';
 
 @Controller()
 export class PostsController {
@@ -148,7 +149,7 @@ export class PostsController {
       const payload = this.jwtService.verify<{
         sub: string;
       }>(token, {
-        secret: process.env.JWT_ACCESS_SECRET ?? 'devAccessSecret',
+        secret: getJwtAccessSecret(),
       });
       return payload.sub;
     } catch {

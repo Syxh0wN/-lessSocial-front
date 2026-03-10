@@ -13,6 +13,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { UpdateProfileVisibilityDto } from './dto/update-profile-visibility.dto';
 import { ProfilesService } from './profiles.service';
+import { getJwtAccessSecret } from '../../config/env';
 
 @Controller('profiles')
 export class ProfilesController {
@@ -90,7 +91,7 @@ export class ProfilesController {
       const payload = this.jwtService.verify<{
         sub: string;
       }>(token, {
-        secret: process.env.JWT_ACCESS_SECRET ?? 'devAccessSecret',
+        secret: getJwtAccessSecret(),
       });
       return payload.sub;
     } catch {
