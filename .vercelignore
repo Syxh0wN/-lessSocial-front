@@ -1,0 +1,5 @@
+backend/
+shared/
+node_modules/
+*.log
+.env*
