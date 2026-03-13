@@ -4,7 +4,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, PrismaClientKnownRequestError } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 
@@ -401,7 +401,7 @@ export class ProfilesService {
       return updatedProfile;
     } catch (error) {
       if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error instanceof PrismaClientKnownRequestError &&
         error.code === 'P2002'
       ) {
         throw new ConflictException('Username already in use');
@@ -437,8 +437,8 @@ export class ProfilesService {
       },
     });
     const notificationsData = mentionedUsers
-      .filter((userItem) => userItem.id !== actorUserId)
-      .map((userItem) => ({
+      .filter((userItem: { id: string }) => userItem.id !== actorUserId)
+      .map((userItem: { id: string }) => ({
         mentionedUserId: userItem.id,
         actorUserId,
         sourceType: 'profileBio' as const,
