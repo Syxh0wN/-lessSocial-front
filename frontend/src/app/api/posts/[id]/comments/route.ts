@@ -2,7 +2,7 @@ import { auth } from "@/auth";
 import { NextResponse } from "next/server";
 
 function ResolveApiBaseUrl() {
-  return process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000/api";
+  return process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000/ls";
 }
 
 export async function POST(

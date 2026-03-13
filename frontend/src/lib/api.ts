@@ -8,7 +8,7 @@ import {
 } from "./mockData";
 
 export const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000/api",
+  baseURL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000/ls",
 });
 
 const UseMockData = process.env.NEXT_PUBLIC_USE_MOCK_DATA === "true";

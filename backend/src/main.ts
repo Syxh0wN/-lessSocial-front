@@ -29,7 +29,12 @@ async function bootstrap() {
       forbidUnknownValues: true,
     }),
   );
-  app.setGlobalPrefix('api');
+  app.setGlobalPrefix('ls');
+  
+  app.getHttpAdapter().get("/ls/health", (req, res) => {
+    res.json({ status: "ok", timestamp: new Date().toISOString() });
+  });
+  
   await app.listen(process.env.PORT ?? 3000);
 }
 void bootstrap();

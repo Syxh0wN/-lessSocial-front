@@ -27,7 +27,7 @@ function DecodeJwtExpiryMs(tokenValue?: string) {
 }
 
 async function RefreshBackendToken(refreshToken: string) {
-  const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000/api";
+  const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000/ls";
   const response = await fetch(`${apiBaseUrl}/auth/refresh`, {
     method: "POST",
     headers: {
@@ -74,7 +74,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const normalizedUsername = usernameBase
           .toLowerCase()
           .replace(/[^a-z0-9_-]/g, "");
-        const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000/api";
+        const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000/ls";
         const response = await fetch(`${apiBaseUrl}/auth/google`, {
           method: "POST",
           headers: {
